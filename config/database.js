@@ -1,19 +1,24 @@
-const mysql = require("mysql2/promise");
-require("dotenv").config();
+const { Pool } = require('pg');
+require('dotenv').config();
 
-// Database configuration
+// PostgreSQL configuration
 const dbConfig = {
-  host: process.env.DB_HOST || "sql.freedb.tech",
-  user: process.env.DB_USER || "freedb_dhruvjivani",
-  password: process.env.DB_PASSWORD ,
-  database: process.env.DB_NAME || "freedb_campusfind",
-  port: process.env.DB_PORT || 3306,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-  enableKeepAlive: true,
-  keepAliveInitialDelay: 0,
-  connectTimeout: 10000,
+  host: process.env.DB_HOST || 'localhost',
+  port: process.env.DB_PORT || 5432,
+  user: process.env.DB_USER || 'postgres',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'campusfind_db',
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 };
 
-module.exports = { dbConfig };
+const pool = new Pool(dbConfig);
+
+pool.on('connect', () => {
+  console.log('✅ PostgreSQL connected!');
+});
+
+pool.on('error', (err) => {
+  console.error('❌ PostgreSQL error:', err.message);
+});
+
+module.exports = pool;

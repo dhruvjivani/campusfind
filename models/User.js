@@ -1,8 +1,5 @@
-const { dbConfig } = require('../config/database');
-const mysql = require('mysql2/promise');
+const pool = require('../config/database');
 const bcrypt = require('bcryptjs');
-
-const pool = mysql.createPool(dbConfig);
 
 class User {
   static async create(userData) {
@@ -15,24 +12,25 @@ class User {
     // Verify .on.ca email
     const isVerified = email.endsWith('.on.ca');
 
-    const [result] = await pool.query(
+    const result = await pool.query(
       `INSERT INTO users 
        (student_id, email, first_name, last_name, campus, program, password, is_verified) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       RETURNING id`,
       [student_id, email, first_name, last_name, campus, program, hashedPassword, isVerified]
     );
     
-    return this.findById(result.insertId);
+    return this.findById(result.rows[0].id);
   }
 
   static async findByEmail(email) {
-    const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
-    return rows[0];
+    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    return result.rows[0];
   }
 
   static async findById(id) {
-    const [rows] = await pool.query('SELECT id, student_id, email, first_name, last_name, campus, program, is_verified, role FROM users WHERE id = ?', [id]);
-    return rows[0];
+    const result = await pool.query('SELECT id, student_id, email, first_name, last_name, campus, program, is_verified, role FROM users WHERE id = $1', [id]);
+    return result.rows[0];
   }
 
   static async comparePassword(plainPassword, hashedPassword) {
@@ -40,10 +38,10 @@ class User {
   }
 
   static async getAllUsers() {
-    const [rows] = await pool.query(
+    const result = await pool.query(
       'SELECT id, student_id, email, first_name, last_name, campus, program, is_verified, role, created_at FROM users'
     );
-    return rows;
+    return result.rows;
   }
 }
 
