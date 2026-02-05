@@ -422,7 +422,7 @@ DB_NAME=freedb_campusfind
 DB_PORT=3306
 
 # Authentication
-JWT_SECRET=your_super_secret_jwt_key_change_this
+JWT_SECRET="secreatkeyforcampusfindapp"
 JWT_EXPIRE=7d
 
 # File Upload
@@ -596,8 +596,8 @@ Need help? Here's what to do:
 
 **Making lost items found, one campus at a time**
 
-[![GitHub stars](https://img.shields.io/github/stars/yourusername/campusfind?style=social)](https://github.com/yourusername/campusfind)
-[![GitHub forks](https://img.shields.io/github/forks/yourusername/campusfind?style=social)](https://github.com/yourusername/campusfind/fork)
+[![GitHub stars](https://img.shields.io/github/stars/dhruvjivani/campusfind?style=social)](https://github.com/dhruvjivani/campusfind)
+[![GitHub forks](https://img.shields.io/github/forks/dhruvjivani/campusfind?style=social)](https://github.com/dhruvjivani/campusfind/fork)
 
 [⬆️ Back to Top](#-campusfind)
 
