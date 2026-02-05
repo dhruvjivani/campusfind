@@ -1,28 +1,19 @@
 const mysql = require("mysql2/promise");
 require("dotenv").config();
 
-const pool = mysql.createPool({
+// Database configuration
+const dbConfig = {
   host: process.env.DB_HOST || "sql.freedb.tech",
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT,
+  user: process.env.DB_USER || "freedb_dhruvjivani",
+  password: process.env.DB_PASSWORD || "NzWef2g$*mjjAY?",
+  database: process.env.DB_NAME || "freedb_campusfind",
+  port: process.env.DB_PORT || 3306,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  ssl: {
-    rejectUnauthorized: false,
-  },
-});
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 0,
+  connectTimeout: 10000,
+};
 
-pool
-  .getConnection()
-  .then((conn) => {
-    console.log("DB connected!");
-    conn.release();
-  })
-  .catch((err) => {
-    console.error("DB failed:", err);
-  });
-
-module.exports = pool;
+module.exports = { dbConfig };

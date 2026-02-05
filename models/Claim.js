@@ -1,4 +1,7 @@
-const pool = require('../config/database');
+const { dbConfig } = require('../config/database');
+const mysql = require('mysql2/promise');
+
+const pool = mysql.createPool(dbConfig);
 
 class Claim {
   static async create(claimData) {

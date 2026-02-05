@@ -1,5 +1,8 @@
-const pool = require('../config/database');
+const { dbConfig } = require('../config/database');
+const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
+
+const pool = mysql.createPool(dbConfig);
 
 class User {
   static async create(userData) {
