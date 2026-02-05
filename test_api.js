@@ -1,9 +1,13 @@
 const axios = require('axios');
 
-const API_BASE = 'https://campusfind-uuwa.onrender.com';
+// Use production URL or fall back to localhost for testing
+const API_BASE = process.env.API_URL || 'https://campusfind-uuwa.onrender.com';
+const USE_LOCALHOST = process.argv.includes('--local');
+const ACTUAL_API_BASE = USE_LOCALHOST ? 'http://localhost:5000' : API_BASE;
 
 async function testAPI() {
-  console.log('🚀 Testing CampusFind API - Full CRUD Operations...\n');
+  console.log(`🚀 Testing CampusFind API - Full CRUD Operations...`);
+  console.log(`📡 API Base: ${ACTUAL_API_BASE}\n`);
   
   let token, token2, itemId, itemId2, itemId3, claimId, claimId2;
   
@@ -12,7 +16,7 @@ async function testAPI() {
     console.log('📝 === AUTHENTICATION ===\n');
     
     console.log('1. Testing health check...');
-    const health = await axios.get(`${API_BASE}/`);
+    const health = await axios.get(`${ACTUAL_API_BASE}/`);
     console.log('✅ Health check passed:', health.data.message);
     
     console.log('\n2. Registering first user...');
@@ -27,7 +31,7 @@ async function testAPI() {
       password: 'Test123'
     };
     
-    const register = await axios.post(`${API_BASE}/api/auth/register`, registerData);
+    const register = await axios.post(`${ACTUAL_API_BASE}/api/auth/register`, registerData);
     console.log('✅ User registered:', register.data.user.email);
     token = register.data.token;
     
@@ -42,12 +46,12 @@ async function testAPI() {
       password: 'Test123'
     };
     
-    const register2 = await axios.post(`${API_BASE}/api/auth/register`, registerData2);
+    const register2 = await axios.post(`${ACTUAL_API_BASE}/api/auth/register`, registerData2);
     console.log('✅ Second user registered:', register2.data.user.email);
     token2 = register2.data.token;
     
     console.log('\n4. Testing login...');
-    const login = await axios.post(`${API_BASE}/api/auth/login`, {
+    const login = await axios.post(`${ACTUAL_API_BASE}/api/auth/login`, {
       email: registerData.email,
       password: 'Test123'
     });
@@ -64,7 +68,7 @@ async function testAPI() {
     formData.append('location_found', 'Library Main Entrance');
     formData.append('campus', 'Main');
     
-    const item = await axios.post(`${API_BASE}/api/items/found`, formData, {
+    const item = await axios.post(`${ACTUAL_API_BASE}/api/items/found`, formData, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'multipart/form-data'
@@ -81,7 +85,7 @@ async function testAPI() {
     formData2.append('location_lost', 'Parking Lot A');
     formData2.append('campus', 'Main');
     
-    const lostItem = await axios.post(`${API_BASE}/api/items/lost`, formData2, {
+    const lostItem = await axios.post(`${ACTUAL_API_BASE}/api/items/lost`, formData2, {
       headers: {
         'Authorization': `Bearer ${token2}`,
         'Content-Type': 'multipart/form-data'
@@ -91,15 +95,15 @@ async function testAPI() {
     console.log('✅ Lost item created:', lostItem.data.item.title, '(Status: lost)');
     
     console.log('\n7. READ - Getting single item...');
-    const getItem = await axios.get(`${API_BASE}/api/items/${itemId}`);
+    const getItem = await axios.get(`${ACTUAL_API_BASE}/api/items/${itemId}`);
     console.log('✅ Retrieved item:', getItem.data.title, 'by', getItem.data.first_name);
     
     console.log('\n8. READ - Getting all items with filters...');
-    const items = await axios.get(`${API_BASE}/api/items?category=electronics&limit=10&page=1`);
+    const items = await axios.get(`${ACTUAL_API_BASE}/api/items?category=electronics&limit=10&page=1`);
     console.log(`✅ Retrieved ${items.data.count} items (Total: ${items.data.total})`);
     
     console.log('\n9. UPDATE - Updating item details...');
-    const updateItem = await axios.put(`${API_BASE}/api/items/${itemId}`, {
+    const updateItem = await axios.put(`${ACTUAL_API_BASE}/api/items/${itemId}`, {
       title: 'iPhone 14 Pro - Space Black',
       description: 'Found near library entrance, pristine condition'
     }, {
@@ -111,7 +115,7 @@ async function testAPI() {
     console.log('\n\n🎯 === CLAIMS CRUD OPERATIONS ===\n');
     
     console.log('10. CREATE - Submitting claim for item...');
-    const claim = await axios.post(`${API_BASE}/api/claims`, {
+    const claim = await axios.post(`${ACTUAL_API_BASE}/api/claims`, {
       item_id: itemId2
     }, {
       headers: { 'Authorization': `Bearer ${token}` }
@@ -127,7 +131,7 @@ async function testAPI() {
     formData3.append('location_found', 'Cafeteria');
     formData3.append('campus', 'Main');
     
-    const item3 = await axios.post(`${API_BASE}/api/items/found`, formData3, {
+    const item3 = await axios.post(`${ACTUAL_API_BASE}/api/items/found`, formData3, {
       headers: {
         'Authorization': `Bearer ${token2}`,
         'Content-Type': 'multipart/form-data'
@@ -137,7 +141,7 @@ async function testAPI() {
     console.log('✅ Second item created for claim test (ID:', itemId3, ')');
     
     console.log('\n12. CREATE - Submitting second claim...');
-    const claim2 = await axios.post(`${API_BASE}/api/claims`, {
+    const claim2 = await axios.post(`${ACTUAL_API_BASE}/api/claims`, {
       item_id: itemId3
     }, {
       headers: { 'Authorization': `Bearer ${token}` }
@@ -146,25 +150,25 @@ async function testAPI() {
     console.log('✅ Second claim submitted (ID:', claimId2, ')');
     
     console.log('\n13. READ - Getting single claim...');
-    const getClaim = await axios.get(`${API_BASE}/api/claims/${claimId}`, {
+    const getClaim = await axios.get(`${ACTUAL_API_BASE}/api/claims/${claimId}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     console.log('✅ Retrieved claim for item:', getClaim.data.item_title);
     
     console.log('\n14. READ - Getting user claims...');
-    const userClaims = await axios.get(`${API_BASE}/api/claims/user/my-claims`, {
+    const userClaims = await axios.get(`${ACTUAL_API_BASE}/api/claims/user/my-claims`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     console.log(`✅ Retrieved ${userClaims.data.count} user claims`);
     
     console.log('\n15. READ - Getting claims for specific item...');
-    const itemClaims = await axios.get(`${API_BASE}/api/items/${itemId3}/claims`, {
+    const itemClaims = await axios.get(`${ACTUAL_API_BASE}/api/items/${itemId3}/claims`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     console.log(`✅ Retrieved ${itemClaims.data.count} claims for this item`);
     
     console.log('\n16. UPDATE - Updating claim...');
-    const updateClaim = await axios.put(`${API_BASE}/api/claims/${claimId2}`, {
+    const updateClaim = await axios.put(`${ACTUAL_API_BASE}/api/claims/${claimId2}`, {
       status: 'pending'
     }, {
       headers: { 'Authorization': `Bearer ${token}` }
@@ -172,13 +176,13 @@ async function testAPI() {
     console.log('✅ Claim updated with status:', updateClaim.data.claim.status);
     
     console.log('\n17. DELETE - Deleting pending claim...');
-    const deleteClaim = await axios.delete(`${API_BASE}/api/claims/${claimId2}`, {
+    const deleteClaim = await axios.delete(`${ACTUAL_API_BASE}/api/claims/${claimId2}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     console.log('✅ Claim deleted successfully');
     
     // Verify item status reverted
-    const itemAfterDelete = await axios.get(`${API_BASE}/api/items/${itemId3}`);
+    const itemAfterDelete = await axios.get(`${ACTUAL_API_BASE}/api/items/${itemId3}`);
     console.log('   Item status reverted to:', itemAfterDelete.data.status);
     
     // ============ TEST SUMMARY ============
