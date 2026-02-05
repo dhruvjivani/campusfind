@@ -59,3 +59,9 @@ typings/
 
 # next.js build output
 .next
+# Unnecessary files
+# uploads/
+.vscode/
+campusfind/
+app.js
+test_db_connection.js
