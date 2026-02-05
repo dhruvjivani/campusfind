@@ -1,0 +1,371 @@
+================================================================================
+CAMPUSFIND - LOST & FOUND SYSTEM
+Full Project Documentation
+================================================================================
+
+PROJECT OVERVIEW
+================================================================================
+CampusFind is a comprehensive Lost & Found management system designed for college
+campuses. It allows students and staff to report lost/found items, submit claims,
+and manage the retrieval process efficiently.
+
+TECH STACK
+================================================================================
+Frontend:
+  - HTML5, CSS3, JavaScript
+  - Static files served from public/
+
+Backend:
+  - Node.js v14+
+  - Express.js (Web framework)
+  - MySQL 8.0+ (Database)
+  - JWT (Authentication)
+  - Bcryptjs (Password hashing)
+  - Multer (File uploads)
+  - Cors (Cross-origin requests)
+
+INSTALLATION & SETUP
+================================================================================
+
+1. Prerequisites:
+   - Node.js installed
+   - MySQL server running
+   - npm package manager
+
+2. Install dependencies:
+   npm install
+
+3. Environment Configuration (.env):
+   Create .env file in root directory with:
+   
+   PORT=5000
+   NODE_ENV=development
+   
+   DB_HOST=localhost
+   DB_USER=root
+   DB_PASSWORD=
+   DB_NAME=campusfind_db
+   DB_PORT=3306
+   
+   JWT_SECRET=your_super_secret_jwt_key_change_this_in_production
+   JWT_EXPIRE=7d
+   
+   MAX_FILE_SIZE=5000000
+   UPLOAD_PATH=./uploads/
+
+4. Setup Database:
+   node config/setupDatabase.js
+   (Creates tables and inserts sample data)
+
+5. Start Server:
+   npm start
+   or for development with auto-reload:
+   npm run dev
+
+SERVER WILL RUN ON: http://localhost:5000
+
+PROJECT STRUCTURE
+================================================================================
+
+campusfind/
+├── bin/
+│   └── www                          # Server entry point
+├── config/
+│   ├── database.js                  # Database connection pool
+│   └── setupDatabase.js             # DB initialization & sample data
+├── controllers/
+│   ├── authController.js            # Authentication logic
+│   ├── itemController.js            # Item CRUD operations
+│   └── claimController.js           # Claim CRUD operations
+├── middleware/
+│   ├── auth.js                      # JWT verification & authorization
+│   └── upload.js                    # File upload handling
+├── models/
+│   ├── User.js                      # User model & methods
+│   ├── Item.js                      # Item model & methods
+│   └── Claim.js                     # Claim model & methods
+├── public/
+│   ├── index.html                   # Frontend homepage
+│   ├── javascripts/                 # Client-side scripts
+│   └── stylesheets/
+│       └── style.css                # Styling
+├── routes/
+│   ├── authRoutes.js                # Auth endpoints
+│   ├── itemRoutes.js                # Item endpoints
+│   └── claimRoutes.js               # Claim endpoints
+├── uploads/                         # Uploaded item images
+├── app.js                           # Legacy Express app config
+├── server.js                        # Main server file
+├── test_api.js                      # Comprehensive API tests
+├── package.json                     # Dependencies
+├── .env                             # Environment variables
+└── README.md                        # This documentation
+
+DATABASE SCHEMA
+================================================================================
+
+USERS Table:
+  id              INT (PRIMARY KEY, AUTO_INCREMENT)
+  student_id      VARCHAR(20) UNIQUE NOT NULL
+  email           VARCHAR(100) UNIQUE NOT NULL
+  first_name      VARCHAR(50) NOT NULL
+  last_name       VARCHAR(50) NOT NULL
+  campus          VARCHAR(50) NOT NULL
+  program         VARCHAR(100)
+  password        VARCHAR(255) NOT NULL (hashed)
+  is_verified     BOOLEAN DEFAULT FALSE
+  role            ENUM('student', 'staff') DEFAULT 'student'
+  created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE
+
+ITEMS Table:
+  id              INT (PRIMARY KEY, AUTO_INCREMENT)
+  title           VARCHAR(100) NOT NULL
+  category        ENUM('electronics','textbooks','keys','id_cards','clothing','bags','other')
+  description     TEXT
+  location_found  VARCHAR(255) NOT NULL
+  campus          VARCHAR(50) NOT NULL
+  status          ENUM('lost','found','claimed') DEFAULT 'found'
+  image_url       VARCHAR(500)
+  user_id         INT NOT NULL (FOREIGN KEY → users.id)
+  created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE
+
+CLAIMS Table:
+  id              INT (PRIMARY KEY, AUTO_INCREMENT)
+  item_id         INT NOT NULL (FOREIGN KEY → items.id)
+  claimer_id      INT NOT NULL (FOREIGN KEY → users.id)
+  owner_id        INT (FOREIGN KEY → users.id)
+  status          ENUM('pending','verified','rejected','completed') DEFAULT 'pending'
+  verification_notes TEXT
+  created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE
+
+FULL CRUD OPERATIONS
+================================================================================
+
+AUTHENTICATION
+--------------
+POST   /api/auth/register            - Register new user
+POST   /api/auth/login               - Login user (returns JWT token)
+
+ITEMS - CREATE
+--------------
+POST   /api/items/found              - Report found item (with optional image)
+POST   /api/items/lost               - Report lost item (with optional image)
+
+ITEMS - READ
+-----------
+GET    /api/items                    - Get all items (with filters & pagination)
+GET    /api/items/:id                - Get single item
+
+ITEMS - UPDATE
+--------------
+PUT    /api/items/:id                - Update item details
+PUT    /api/items/:id/status         - Update item status (staff only)
+
+ITEMS - DELETE
+--------------
+DELETE /api/items/:id                - Delete item (staff only)
+
+CLAIMS - CREATE
+---------------
+POST   /api/claims                   - Submit claim for item
+
+CLAIMS - READ
+-------------
+GET    /api/claims/:id               - Get single claim
+GET    /api/claims/user/my-claims    - Get user's claims
+GET    /api/items/:id/claims         - Get all claims for item
+
+CLAIMS - UPDATE
+---------------
+PUT    /api/claims/:id               - Update claim details
+PUT    /api/claims/:id/verify        - Verify/reject claim (staff only)
+
+CLAIMS - DELETE
+---------------
+DELETE /api/claims/:id               - Cancel pending claim
+
+AUTHENTICATION & AUTHORIZATION
+================================================================================
+
+User Roles:
+  - Student:  Can report items, submit claims, update own items/claims
+  - Staff:    Full access, can verify claims, manage all items
+
+JWT Token:
+  - Issued on successful registration/login
+  - Expires in 7 days (configurable)
+  - Must be included in Authorization header: "Bearer <token>"
+
+Protected Routes:
+  - All item/claim operations except GET require authentication
+  - Staff-only operations require role='staff'
+
+Query Parameters (Items)
+================================================================================
+
+GET /api/items Supports:
+  - category  : electronics|textbooks|keys|id_cards|clothing|bags|other
+  - campus    : Main|Waterloo|Cambridge
+  - status    : lost|found|claimed
+  - search    : Text search in title/description
+  - limit     : Items per page (default: 20)
+  - page      : Page number (default: 1)
+
+Example:
+  GET /api/items?category=electronics&campus=Main&limit=10&page=1
+
+API RESPONSE FORMAT
+================================================================================
+
+Success Response (200, 201):
+{
+  "message": "Operation successful",
+  "data": { ... },
+  "success": true
+}
+
+Error Response:
+{
+  "message": "Error description",
+  "error": { ... }
+}
+
+Status Codes:
+  200 - OK (GET, PUT, DELETE success)
+  201 - Created (POST success)
+  400 - Bad Request (Invalid data)
+  401 - Unauthorized (Missing/invalid token)
+  403 - Forbidden (Insufficient permissions)
+  404 - Not Found (Resource doesn't exist)
+  500 - Server Error
+
+SAMPLE DATA
+================================================================================
+
+The database includes pre-loaded sample data:
+
+Users (6):
+  - 2 Staff members (with role='staff')
+  - 4 Students (with role='student')
+
+Items (10):
+  - Electronics, Textbooks, Keys, Bags, Clothing
+  - Across different campuses (Main, Waterloo, Cambridge)
+  - Various statuses (lost, found, claimed)
+
+Claims (6):
+  - Different statuses: pending, verified, rejected, completed
+  - Demonstrate complete claim lifecycle
+
+TESTING
+================================================================================
+
+Run comprehensive API tests:
+  node test_api.js
+
+Tests cover:
+  ✓ User authentication
+  ✓ Item CRUD operations
+  ✓ Claim CRUD operations
+  ✓ Authorization enforcement
+  ✓ Claim-item relationship management
+  ✓ Status transitions
+
+FILE UPLOAD
+================================================================================
+
+Supported Formats: JPG, PNG, GIF, WebP
+Max File Size: 5MB (configurable in .env)
+Upload Directory: ./uploads/
+
+Files automatically deleted when item is deleted.
+
+ERROR HANDLING
+================================================================================
+
+Common Errors:
+
+1. Database Connection Failed
+   Solution: Check MySQL is running, verify DB credentials in .env
+
+2. Port Already in Use
+   Solution: Change PORT in .env or kill process using port 5000
+
+3. JWT Token Expired
+   Solution: Login again to get new token
+
+4. File Upload Failed
+   Solution: Check file size < 5MB, format supported
+
+SECURITY FEATURES
+================================================================================
+
+✓ Password Hashing: Bcryptjs with salt rounds 10
+✓ JWT Authentication: Secure token-based access
+✓ Email Verification: .on.ca domain verification
+✓ Authorization: Role-based access control
+✓ File Upload: Type and size validation
+✓ SQL Injection Protection: Parameterized queries
+✓ CORS: Configured for frontend requests
+
+ENVIRONMENT CONFIGURATION
+================================================================================
+
+Development:
+  NODE_ENV=development
+  JWT_EXPIRE=7d
+  Error details shown in responses
+
+Production (Recommended):
+  NODE_ENV=production
+  JWT_EXPIRE=7d (or shorter)
+  Error details hidden
+  Change JWT_SECRET to strong value
+  Use environment-specific DB credentials
+
+TROUBLESHOOTING
+================================================================================
+
+Issue: "Cannot find module 'mysql2'"
+Fix: npm install mysql2
+
+Issue: "Database does not exist"
+Fix: node config/setupDatabase.js
+
+Issue: "EADDRINUSE: address already in use"
+Fix: Change PORT in .env or restart system
+
+Issue: "JWT malformed or invalid"
+Fix: Clear old tokens, login again
+
+Issue: "File upload fails"
+Fix: Check uploads/ directory exists and has write permissions
+
+FUTURE ENHANCEMENTS
+================================================================================
+
+Planned Features:
+  - Email notifications for claims
+  - Image gallery for items
+  - Advanced analytics dashboard
+  - Mobile app
+  - Real-time chat between claimer and owner
+  - QR code generation for items
+  - Integration with campus systems
+
+CONTACT & SUPPORT
+================================================================================
+
+For issues or questions:
+- Check error messages and logs
+- Review test_api.js for usage examples
+- Verify .env configuration
+- Check database connectivity
+
+================================================================================
+Last Updated: February 4, 2026
+Version: 1.0.0
+================================================================================
