@@ -116,7 +116,7 @@ npm install
 npm start
 ```
 
-> 🎉 Production URL: **`https://campusfind-uuwa.onrender.com`**
+> 🎉 Production URL: **`https://campusfind-0463.onrender.com`**
 
 <details>
 <summary><b>Local Development</b></summary>
@@ -335,13 +335,13 @@ node test_api.js
 
 ```bash
 # Get all items (Production)
-curl https://campusfind-uuwa.onrender.com/api/items
+curl https://campusfind-0463.onrender.com//api/items
 
 # Filter by category
-curl "https://campusfind-uuwa.onrender.com/api/items?category=electronics&status=lost"
+curl "https://campusfind-0463.onrender.com//api/items?category=electronics&status=lost"
 
 # Register user
-curl -X POST https://campusfind-uuwa.onrender.com/api/auth/register \
+curl -X POST https://campusfind-0463.onrender.com//api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "student_id": "001",
@@ -391,7 +391,7 @@ curl -X POST https://campusfind-uuwa.onrender.com/api/auth/register \
 ### Upload Example
 
 ```bash
-curl -X POST https://campusfind-uuwa.onrender.com/api/items/found \
+curl -X POST https://campusfind-0463.onrender.com//api/items/found \
   -H "Authorization: Bearer <your-token>" \
   -F "title=Lost iPhone" \
   -F "category=electronics" \

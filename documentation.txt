@@ -62,7 +62,7 @@ INSTALLATION & SETUP
    or for development with auto-reload:
    npm run dev
 
-PRODUCTION SERVER: https://campusfind-uuwa.onrender.com
+PRODUCTION SERVER: https://campusfind-0463.onrender.com
 LOCAL DEVELOPMENT: http://localhost:5000
 
 PROJECT STRUCTURE
