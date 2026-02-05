@@ -116,13 +116,13 @@ npm install
 npm start
 ```
 
-> 🎉 Server running at **`http://localhost:5000`**
+> 🎉 Production URL: **`https://campusfind-uuwa.onrender.com`**
 
 <details>
-<summary><b>Development Mode</b></summary>
+<summary><b>Local Development</b></summary>
 <br>
 
-For auto-reload during development:
+For local testing with auto-reload:
 
 ```bash
 npm run dev
@@ -334,14 +334,14 @@ node test_api.js
 ### Manual Testing Examples
 
 ```bash
-# Get all items
-curl http://localhost:5000/api/items
+# Get all items (Production)
+curl https://campusfind-uuwa.onrender.com/api/items
 
 # Filter by category
-curl "http://localhost:5000/api/items?category=electronics&status=lost"
+curl "https://campusfind-uuwa.onrender.com/api/items?category=electronics&status=lost"
 
 # Register user
-curl -X POST http://localhost:5000/api/auth/register \
+curl -X POST https://campusfind-uuwa.onrender.com/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "student_id": "001",
@@ -391,7 +391,7 @@ curl -X POST http://localhost:5000/api/auth/register \
 ### Upload Example
 
 ```bash
-curl -X POST http://localhost:5000/api/items/found \
+curl -X POST https://campusfind-uuwa.onrender.com/api/items/found \
   -H "Authorization: Bearer <your-token>" \
   -F "title=Lost iPhone" \
   -F "category=electronics" \
