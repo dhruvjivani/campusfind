@@ -5,7 +5,7 @@ require("dotenv").config();
 const dbConfig = {
   host: process.env.DB_HOST || "sql.freedb.tech",
   user: process.env.DB_USER || "freedb_dhruvjivani",
-  password: process.env.DB_PASSWORD || "NzWef2g$*mjjAY?",
+  password: process.env.DB_PASSWORD ,
   database: process.env.DB_NAME || "freedb_campusfind",
   port: process.env.DB_PORT || 3306,
   waitForConnections: true,
