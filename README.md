@@ -1,25 +1,59 @@
 <div align="center">
 
-# 🎓 CampusFind - Lost & Found System
+<img src="https://raw.githubusercontent.com/github/explore/main/topics/nodejs/nodejs.png" width="100" alt="Node.js Logo">
 
-<div>
-<img src="https://img.shields.io/badge/Node.js-v14+-green?style=for-the-badge&logo=node.js" alt="Node.js">
-<img src="https://img.shields.io/badge/Express.js-Framework-black?style=for-the-badge&logo=express" alt="Express.js">
-<img src="https://img.shields.io/badge/MySQL-Database-orange?style=for-the-badge&logo=mysql" alt="MySQL">
-<img src="https://img.shields.io/badge/JWT-Auth-blue?style=for-the-badge" alt="JWT">
-</div>
+# 🎓 CampusFind
+
+### *Lost & Found System for College Communities*
+
+[![Node.js Version](https://img.shields.io/badge/Node.js-v14+-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Express.js](https://img.shields.io/badge/Express.js-4.x-000000?style=flat-square&logo=express&logoColor=white)](https://expressjs.com/)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?style=flat-square&logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![JWT](https://img.shields.io/badge/Auth-JWT-000000?style=flat-square&logo=jsonwebtokens&logoColor=white)](https://jwt.io/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
 **A comprehensive RESTful API for managing lost and found items on college campuses**
 
-> Students report items, search lost belongings, and submit claims with complete staff verification workflow
+*Students report items • Search belongings • Submit claims with complete verification workflow*
 
-[Features](#-features) • [Installation](#-installation--setup) • [API Docs](#-api-endpoints) • [Testing](#-testing) • [License](#-license)
+[🚀 Quick Start](#-quick-start) • [📖 API Docs](#-api-endpoints) • [🎯 Features](#-features) • [🧪 Testing](#-testing)
+
+<img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="700">
 
 </div>
 
 ---
 
+## ✨ Highlights
+
+<table>
+<tr>
+<td width="33%" align="center">
+<img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Locked.png" width="50">
+<h3>Secure Auth</h3>
+<p>JWT-based authentication with .on.ca email verification</p>
+</td>
+<td width="33%" align="center">
+<img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Magnifying%20Glass%20Tilted%20Left.png" width="50">
+<h3>Smart Search</h3>
+<p>Advanced filtering by category, campus, status with pagination</p>
+</td>
+<td width="33%" align="center">
+<img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Check%20Mark%20Button.png" width="50">
+<h3>Claim System</h3>
+<p>Complete staff verification workflow for item claims</p>
+</td>
+</tr>
+</table>
+
+---
+
 ## 🎯 Features
+
+<details open>
+<summary><b>🔐 Core Functionality</b></summary>
+<br>
 
 - ✅ **User Authentication** - Secure JWT-based login with .on.ca email verification
 - ✅ **Item Management** - Report lost/found items with images, full CRUD operations  
@@ -27,230 +61,256 @@
 - ✅ **Claim Verification** - Submit claims with complete staff review workflow
 - ✅ **Role-Based Access** - Student and staff permissions enforced
 - ✅ **Image Uploads** - Support for item photos (JPG, PNG, GIF, WebP)
-- ✅ **Production Ready** - Database on FreDB.tech, fully tested
-- ✅ **Database with Sample Data** - 6 users, 13+ items, 6+ claims
 
-## 🔧 Tech Stack
+</details>
 
-<table>
-<tr>
-<td width="50%">
+<details>
+<summary><b>🚀 Production Features</b></summary>
+<br>
 
-### Backend
-- **Runtime:** Node.js v14+
-- **Framework:** Express.js
-- **Database:** MySQL 8.0+
-- **Authentication:** JWT
-- **Encryption:** Bcryptjs
-- **File Upload:** Multer
-- **HTTP Client:** Axios
+- ✅ **Live Database** - Hosted on FreDB.tech, fully operational
+- ✅ **Sample Data** - 6 users, 13+ items, 6+ claims pre-loaded
+- ✅ **Comprehensive Testing** - Full test suite covering all endpoints
+- ✅ **Security First** - Password hashing, JWT tokens, input validation
+- ✅ **Error Handling** - Robust error responses with proper status codes
+- ✅ **RESTful Design** - Standard HTTP methods and response formats
 
-</td>
-<td width="50%">
+</details>
 
-### Frontend
-- **Markup:** HTML5
-- **Styling:** CSS3
-- **Scripts:** Vanilla JavaScript
-- **HTTP:** Fetch API
-- **Storage:** LocalStorage
+---
 
-</td>
-</tr>
-</table>
+## 🛠️ Tech Stack
 
-## 📦 Installation & Setup
+<div align="center">
+
+| Backend | Frontend | Database | Auth |
+|:-------:|:--------:|:--------:|:----:|
+| ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white) | ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white) | ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white) | ![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white) |
+| ![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white) | ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white) | ![FreDB](https://img.shields.io/badge/FreDB.tech-FF6B6B?style=for-the-badge) | ![Bcrypt](https://img.shields.io/badge/Bcrypt-338854?style=for-the-badge) |
+| ![Multer](https://img.shields.io/badge/Multer-FF6384?style=for-the-badge) | ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black) | | |
+
+</div>
+
+---
+
+## 🚀 Quick Start
 
 ### Prerequisites
 
-```
+```bash
 ✓ Node.js v14+ installed
 ✓ npm package manager
 ✓ Port 5000 available (or modify in .env)
-✓ Production database already configured (FreDB.tech)
 ```
 
-### 🚀 Quick Start
+### Installation
 
 ```bash
-# 1. Navigate to project directory
+# 1️⃣ Navigate to project directory
 cd campusfind
 
-# 2. Install dependencies
+# 2️⃣ Install dependencies
 npm install
 
-# 3. Start the server
+# 3️⃣ Start the server
 npm start
 ```
 
-> Server will be running at **`http://localhost:5000`**
+> 🎉 Server running at **`http://localhost:5000`**
 
-**For development with auto-reload:**
+<details>
+<summary><b>Development Mode</b></summary>
+<br>
+
+For auto-reload during development:
+
 ```bash
 npm run dev
 ```
 
-### 📝 Configuration
+</details>
 
-The `.env` file is **pre-configured for production** (FreDB.tech):
+---
 
-```env
-DB_HOST=sql.freedb.tech
-DB_USER=freedb_dhruvjivani
-DB_PASSWORD=NzWef2g$*mjjAY?
-DB_NAME=freedb_campusfind
-NODE_ENV=production
-```
-
-> ⚠️ Sample data is already loaded in production database
-
-### 🔄 Using Local Development Database (Optional)
-
-```bash
-# 1. Edit .env file
-# - Uncomment local database section
-# - Comment production settings
-
-# 2. Initialize local database
-node config/setupDatabase.js
-
-# 3. Start server
-npm start
-```
-
-## 📁 Project Structure
+## 📁 Project Architecture
 
 ```
 campusfind/
-├── 📂 bin/
-│   └── www                    # Server entry point configuration
 │
-├── 📂 config/
-│   ├── database.js            # MySQL connection pool setup
-│   └── setupDatabase.js       # Table creation & sample data
+├── 🔧 config/
+│   ├── database.js              # MySQL connection pool
+│   └── setupDatabase.js         # DB initialization & sample data
 │
-├── 📂 controllers/            # Business logic & request handlers
-│   ├── authController.js      # User authentication (register, login)
-│   ├── itemController.js      # Item CRUD operations
-│   └── claimController.js     # Claim CRUD operations
+├── 🎮 controllers/
+│   ├── authController.js        # Authentication logic
+│   ├── itemController.js        # Item CRUD operations
+│   └── claimController.js       # Claim management
 │
-├── 📂 middleware/
-│   ├── auth.js                # JWT verification & authorization
-│   └── upload.js              # File upload handling (Multer)
+├── 🛡️ middleware/
+│   ├── auth.js                  # JWT verification
+│   └── upload.js                # File upload handling
 │
-├── 📂 models/                 # Data access layer
-│   ├── User.js                # User database methods
-│   ├── Item.js                # Item database methods
-│   └── Claim.js               # Claim database methods
+├── 💾 models/
+│   ├── User.js                  # User data layer
+│   ├── Item.js                  # Item data layer
+│   └── Claim.js                 # Claim data layer
 │
-├── 📂 public/                 # Frontend assets
-│   ├── index.html             # Homepage
-│   ├── javascripts/           # Client-side scripts
-│   └── stylesheets/           # CSS styling
+├── 🌐 routes/
+│   ├── authRoutes.js            # Auth endpoints
+│   ├── itemRoutes.js            # Item endpoints
+│   └── claimRoutes.js           # Claim endpoints
 │
-├── 📂 routes/                 # API endpoint definitions
-│   ├── authRoutes.js          # Auth endpoints
-│   ├── itemRoutes.js          # Item endpoints
-│   └── claimRoutes.js         # Claim endpoints
+├── 🎨 public/
+│   ├── index.html               # Frontend UI
+│   ├── javascripts/             # Client scripts
+│   └── stylesheets/             # CSS files
 │
-├── 📂 uploads/                # Uploaded item images
+├── 📸 uploads/                  # Item images
 │
-├── 📄 server.js               # Express server configuration
-├── 📄 app.js                  # Main application entry
-├── 📄 test_api.js             # Comprehensive API test suite
-├── 📄 package.json            # Project dependencies
-├── 📄 .env                    # Environment variables
-└── 📄 README.md               # This file
+├── 📄 server.js                 # Express configuration
+└── 🧪 test_api.js              # API test suite
 ```
 
-## 🔐 API Endpoints
+---
 
-### 🔑 Authentication (2 endpoints)
-| Method | Endpoint | Description |
-|:------:|----------|-------------|
-| `POST` | `/api/auth/register` | Create new account |
-| `POST` | `/api/auth/login` | Authenticate user |
+## 🔌 API Endpoints
 
-### 📦 Items - CRUD Operations (7 endpoints)
+### 🔑 Authentication
+
 | Method | Endpoint | Description | Auth |
-|:------:|----------|-------------|------|
-| `POST` | `/api/items/found` | Report found item | ✅ |
-| `POST` | `/api/items/lost` | Report lost item | ✅ |
-| `GET` | `/api/items` | Get all items (filterable) | ❌ |
-| `GET` | `/api/items/:id` | Get single item | ❌ |
-| `PUT` | `/api/items/:id` | Update item details | ✅ |
-| `PUT` | `/api/items/:id/status` | Update status (staff) | 👮 |
-| `DELETE` | `/api/items/:id` | Delete item (staff) | 👮 |
+|:------:|----------|-------------|:----:|
+| <kbd>POST</kbd> | `/api/auth/register` | Create new account | - |
+| <kbd>POST</kbd> | `/api/auth/login` | User login | - |
 
-### 📋 Claims - CRUD Operations (7 endpoints)
+### 📦 Items
+
 | Method | Endpoint | Description | Auth |
-|:------:|----------|-------------|------|
-| `POST` | `/api/claims` | Submit claim for item | ✅ |
-| `GET` | `/api/claims/:id` | Get single claim | ✅ |
-| `GET` | `/api/claims/user/my-claims` | Get user claims | ✅ |
-| `GET` | `/api/items/:id/claims` | Get item claims | ✅ |
-| `PUT` | `/api/claims/:id` | Update claim | ✅ |
-| `PUT` | `/api/claims/:id/verify` | Verify claim (staff) | 👮 |
-| `DELETE` | `/api/claims/:id` | Cancel claim | ✅ |
+|:------:|----------|-------------|:----:|
+| <kbd>POST</kbd> | `/api/items/found` | Report found item | 🔐 |
+| <kbd>POST</kbd> | `/api/items/lost` | Report lost item | 🔐 |
+| <kbd>GET</kbd> | `/api/items` | List all items (filterable) | - |
+| <kbd>GET</kbd> | `/api/items/:id` | Get item details | - |
+| <kbd>PUT</kbd> | `/api/items/:id` | Update item | 🔐 |
+| <kbd>PUT</kbd> | `/api/items/:id/status` | Update status | 👮 Staff |
+| <kbd>DELETE</kbd> | `/api/items/:id` | Delete item | 👮 Staff |
 
-**Legend:** ✅ User Auth Required | 👮 Staff Only | ❌ Public Access
+### 📋 Claims
+
+| Method | Endpoint | Description | Auth |
+|:------:|----------|-------------|:----:|
+| <kbd>POST</kbd> | `/api/claims` | Submit claim | 🔐 |
+| <kbd>GET</kbd> | `/api/claims/:id` | Get claim details | 🔐 |
+| <kbd>GET</kbd> | `/api/claims/user/my-claims` | Get user's claims | 🔐 |
+| <kbd>GET</kbd> | `/api/items/:id/claims` | Get item's claims | 🔐 |
+| <kbd>PUT</kbd> | `/api/claims/:id` | Update claim | 🔐 |
+| <kbd>PUT</kbd> | `/api/claims/:id/verify` | Verify claim | 👮 Staff |
+| <kbd>DELETE</kbd> | `/api/claims/:id` | Cancel claim | 🔐 |
+
+**Legend:** 🔐 = User Auth Required | 👮 = Staff Only
+
+---
 
 ## 🔍 Query Parameters
 
 ### Search & Filter Items
 
-```
+```http
 GET /api/items?category=electronics&campus=Main&status=found&search=phone&limit=10&page=1
 ```
 
-| Parameter | Values | Example |
-|-----------|--------|---------|
-| `category` | electronics, textbooks, keys, id_cards, clothing, bags, other | `?category=electronics` |
-| `campus` | Main, Waterloo, Cambridge | `?campus=Main` |
-| `status` | lost, found, claimed | `?status=lost` |
-| `search` | Text search in title/description | `?search=iPhone` |
-| `limit` | Items per page (default: 20) | `?limit=10` |
-| `page` | Page number (default: 1) | `?page=2` |
+<table>
+<tr>
+<th>Parameter</th>
+<th>Options</th>
+<th>Example</th>
+</tr>
+<tr>
+<td><code>category</code></td>
+<td>electronics, textbooks, keys, id_cards, clothing, bags, other</td>
+<td><code>?category=electronics</code></td>
+</tr>
+<tr>
+<td><code>campus</code></td>
+<td>Main, Waterloo, Cambridge</td>
+<td><code>?campus=Main</code></td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td>lost, found, claimed</td>
+<td><code>?status=lost</code></td>
+</tr>
+<tr>
+<td><code>search</code></td>
+<td>Text search in title/description</td>
+<td><code>?search=iPhone</code></td>
+</tr>
+<tr>
+<td><code>limit</code></td>
+<td>Items per page (default: 20)</td>
+<td><code>?limit=10</code></td>
+</tr>
+<tr>
+<td><code>page</code></td>
+<td>Page number (default: 1)</td>
+<td><code>?page=2</code></td>
+</tr>
+</table>
 
-**Example:** Get lost electronics from Main campus
-```
-GET /api/items?category=electronics&status=lost&campus=Main
-```
+---
 
 ## 💾 Database Schema
 
-### 👤 Users Table
-```sql
-id (PK) | student_id | email | first_name | last_name | 
-campus | program | password (hashed) | is_verified | 
-role (student/staff) | created_at | updated_at
+<div align="center">
+
+```mermaid
+erDiagram
+    USERS ||--o{ ITEMS : reports
+    USERS ||--o{ CLAIMS : submits
+    ITEMS ||--o{ CLAIMS : has
+    
+    USERS {
+        int id PK
+        string student_id
+        string email
+        string first_name
+        string last_name
+        string campus
+        string role
+        string password
+        timestamp created_at
+    }
+    
+    ITEMS {
+        int id PK
+        string title
+        string category
+        string description
+        string location_found
+        string campus
+        string status
+        string image_url
+        int user_id FK
+        timestamp created_at
+    }
+    
+    CLAIMS {
+        int id PK
+        int item_id FK
+        int claimer_id FK
+        int owner_id FK
+        string status
+        text verification_notes
+        timestamp created_at
+    }
 ```
 
-### 📦 Items Table
-```sql
-id (PK) | title | category | description | location_found | 
-campus | status (lost/found/claimed) | image_url | 
-user_id (FK) | created_at | updated_at
-```
+</div>
 
-### 🏷️ Claims Table
-```sql
-id (PK) | item_id (FK) | claimer_id (FK) | owner_id (FK) | 
-status (pending/verified/rejected/completed) | 
-verification_notes | created_at | updated_at
-```
-
-### Relationships
-```
-User (1) ──→ (∞) Item (reports)
-User (1) ──→ (∞) Claim (submits as claimer)
-User (1) ──→ (∞) Claim (receives as owner)
-Item (1) ──→ (∞) Claim
-```
+---
 
 ## 🧪 Testing
 
-Run comprehensive test suite covering all CRUD operations:
+Run the comprehensive test suite:
 
 ```bash
 node test_api.js
@@ -258,75 +318,81 @@ node test_api.js
 
 ### Test Coverage
 
-```
-✅ Authentication (register, login)
-✅ Item Operations (create found/lost, read, update, delete)
-✅ Claim Management (create, read, update, verify, delete)
-✅ Authorization Checks (role-based access)
-✅ Status Transitions (workflow validation)
-✅ Error Handling (validation, permissions)
-```
+<div align="center">
 
-**Expected Output:** All tests pass with exit code `0`
+| Category | Tests |
+|:--------:|:-----:|
+| ✅ Authentication | Register, Login |
+| ✅ Items CRUD | Create, Read, Update, Delete |
+| ✅ Claims CRUD | Create, Read, Update, Verify, Delete |
+| ✅ Authorization | Role-based access control |
+| ✅ Status Transitions | Workflow validation |
+| ✅ Error Handling | Validation & permissions |
 
-### Manual API Testing
+</div>
+
+### Manual Testing Examples
 
 ```bash
 # Get all items
 curl http://localhost:5000/api/items
 
-# Get items by category
-curl "http://localhost:5000/api/items?category=electronics"
+# Filter by category
+curl "http://localhost:5000/api/items?category=electronics&status=lost"
 
 # Register user
 curl -X POST http://localhost:5000/api/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"student_id":"001","email":"user@on.ca","password":"pass123"}'
+  -d '{
+    "student_id": "001",
+    "email": "user@on.ca",
+    "password": "pass123",
+    "first_name": "John",
+    "last_name": "Doe"
+  }'
 ```
 
-## 📝 Sample Data
+---
 
-Database is pre-populated with:
-- **6 Users**: 2 staff members, 4 students
-- **13 Items**: Electronics, textbooks, keys, bags, etc.
-- **6+ Claims**: Various statuses for testing workflow
+## 🔒 Security Features
 
-## 🔑 Authentication
+<div align="center">
 
-### JWT Token
-```
-Issued on:      successful registration/login
-Expiration:     7 days
-Header Format:  Authorization: Bearer <token>
-Used for:       protecting routes requiring authentication
-```
+| Feature | Implementation |
+|:-------:|:--------------:|
+| 🔐 Password Hashing | Bcryptjs (10 rounds) |
+| 🎫 Authentication | JWT tokens (7-day expiry) |
+| ✉️ Email Validation | .on.ca domain enforcement |
+| 👥 Access Control | Role-based permissions |
+| 📁 File Validation | Type & size checking |
+| 🛡️ SQL Safety | Parameterized queries |
+| ✅ Input Validation | All endpoints validated |
+| 🚫 Error Handling | No sensitive data leakage |
 
-### User Roles
-| Role | Permissions |
-|------|-------------|
-| **Student** | Report items, submit claims, update own items |
-| **Staff** | Full access, verify claims, manage all items |
+</div>
 
-### Example: Using Token
-
-```bash
-curl -X GET http://localhost:5000/api/claims/user/my-claims \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-```
+---
 
 ## 📤 File Upload
 
-### Configuration
-- **Formats:** JPG, PNG, GIF, WebP
-- **Max Size:** 5MB
-- **Storage:** `./uploads/` directory
-- **Validation:** Automatic type & size checking
+### Supported Formats
+
+<div align="center">
+
+![JPG](https://img.shields.io/badge/JPG-Supported-success?style=flat-square)
+![PNG](https://img.shields.io/badge/PNG-Supported-success?style=flat-square)
+![GIF](https://img.shields.io/badge/GIF-Supported-success?style=flat-square)
+![WebP](https://img.shields.io/badge/WebP-Supported-success?style=flat-square)
+
+**Max Size:** 5MB | **Storage:** `./uploads/` directory
+
+</div>
 
 ### Upload Example
 
 ```bash
 curl -X POST http://localhost:5000/api/items/found \
-  -H "Authorization: Bearer <token>" \
+  -H "Authorization: Bearer <your-token>" \
   -F "title=Lost iPhone" \
   -F "category=electronics" \
   -F "description=iPhone 13 Pro" \
@@ -335,27 +401,20 @@ curl -X POST http://localhost:5000/api/items/found \
   -F "image=@/path/to/image.jpg"
 ```
 
-### Response
-```json
-{
-  "message": "Found item reported successfully",
-  "data": {
-    "id": 1,
-    "image_url": "/uploads/1707046800000-item.jpg"
-  }
-}
-```
+---
 
-## ⚙️ Environment Variables
+## ⚙️ Configuration
 
-### Production Configuration (Current)
+### Environment Variables
+
+The `.env` file is **pre-configured** for production (FreDB.tech):
 
 ```env
 # Server
 PORT=5000
 NODE_ENV=production
 
-# Database (FreDB.tech)
+# Database (FreDB.tech - Production)
 DB_HOST=sql.freedb.tech
 DB_USER=freedb_dhruvjivani
 DB_PASSWORD=NzWef2g$*mjjAY?
@@ -371,9 +430,19 @@ MAX_FILE_SIZE=5000000
 UPLOAD_PATH=./uploads/
 ```
 
-### Local Development Configuration (Edit .env to use)
+<details>
+<summary><b>Local Development Setup</b></summary>
+<br>
+
+To use a local database instead:
 
 ```env
+# Comment out production settings
+# DB_HOST=sql.freedb.tech
+# DB_USER=freedb_dhruvjivani
+# ...
+
+# Uncomment local settings
 DB_HOST=localhost
 DB_USER=root
 DB_PASSWORD=
@@ -381,168 +450,159 @@ DB_NAME=campusfind_db
 NODE_ENV=development
 ```
 
-## 🚨 Error Handling
+Then initialize:
 
-### HTTP Status Codes
+```bash
+node config/setupDatabase.js
+npm start
+```
 
-| Code | Meaning | Example |
-|------|---------|---------|
+</details>
+
+---
+
+## 🚨 HTTP Status Codes
+
+<div align="center">
+
+| Code | Status | Description |
+|:----:|:------:|:------------|
 | `200` | ✅ OK | Successful GET request |
-| `201` | ✅ Created | Item/claim successfully created |
+| `201` | ✅ Created | Resource successfully created |
 | `400` | ❌ Bad Request | Invalid data format |
 | `401` | ❌ Unauthorized | Missing/invalid JWT token |
 | `403` | ❌ Forbidden | Insufficient permissions |
 | `404` | ❌ Not Found | Resource doesn't exist |
 | `500` | ❌ Server Error | Internal server error |
 
-### Response Format
+</div>
+
+### Error Response Format
 
 ```json
 {
-  "message": "Descriptive message (error or success)",
-  "data": { },
-  "error": { }
-}
-```
-
-### Example Error Response
-
-```json
-{
-  "message": "Unauthorized",
+  "message": "Descriptive error message",
   "error": {
-    "code": "INVALID_TOKEN",
-    "details": "JWT token expired or invalid"
+    "code": "ERROR_CODE",
+    "details": "Additional information"
   }
 }
 ```
 
+---
+
 ## 🐛 Troubleshooting
 
-| Problem | Solution | Command |
-|---------|----------|---------|
-| Dependencies missing | Install npm packages | `npm install` |
-| Database connection fails | Verify MySQL running, check .env | Check `.env` settings |
-| Port 5000 already in use | Kill process or change port | Change `PORT=5000` in `.env` |
-| JWT token expired | Re-authenticate user | `/api/auth/login` |
-| File upload fails | Check size < 5MB, format valid | Supported: JPG, PNG, GIF, WebP |
-| `Cannot find module` | Run npm install again | `npm install` |
-| `Error: listen EADDRINUSE` | Another process using port | Use different port in `.env` |
+<details>
+<summary><b>Common Issues & Solutions</b></summary>
+<br>
+
+| Issue | Solution |
+|:------|:---------|
+| 📦 Dependencies missing | Run `npm install` |
+| 🔌 Database connection fails | Verify MySQL running, check `.env` credentials |
+| 🚪 Port 5000 already in use | Change `PORT` in `.env` or kill process on port 5000 |
+| 🎫 JWT token expired | Re-authenticate via `/api/auth/login` |
+| 📁 File upload fails | Check file size < 5MB and format is JPG/PNG/GIF/WebP |
+| 📦 `Cannot find module` | Run `npm install` again |
+| 🔒 `EADDRINUSE` error | Another process is using the port |
 
 ### Debug Commands
 
 ```bash
-# Check Node.js version
+# Check versions
 node --version
-
-# Check npm version  
 npm --version
 
-# Test database connection
+# Test database
 node config/setupDatabase.js
 
-# View server logs
+# View logs
 npm start
 
-# Run with verbose logging
+# Verbose logging
 DEBUG=* npm start
 ```
 
-## 📚 Additional Resources
+</details>
 
-### Documentation Files
+---
 
-| File | Purpose |
-|------|---------|
-| [documentation.txt](documentation.txt) | Complete API reference & examples |
-| [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) | Deploy to Render, Heroku, Railway |
-| [QUICK_DEPLOY.md](QUICK_DEPLOY.md) | Copy-paste deployment commands |
-| [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md) | Full project overview |
-| [INDEX.md](INDEX.md) | Documentation navigation |
-
-### Quick Links
-
-- **View All Documentation:** See [INDEX.md](INDEX.md) for navigation
-- **API Reference:** Check [documentation.txt](documentation.txt) for detailed endpoints
-- **Deploy Now:** Follow [QUICK_DEPLOY.md](QUICK_DEPLOY.md) to launch live
-
-## 🔒 Security Features
-
-```
-✓ Password Hashing       → Bcryptjs (10 rounds)
-✓ Authentication        → JWT tokens (7-day expiry)
-✓ Email Validation      → .on.ca domain enforcement
-✓ Role-Based Access     → Student vs Staff permissions
-✓ File Validation       → Type & size checking
-✓ SQL Injection Safety  → Parameterized queries
-✓ Input Validation      → All endpoints validated
-✓ Error Handling        → No sensitive data leakage
-```
-
-### Best Practices Implemented
-
-- ✅ Passwords never stored in plain text
-- ✅ JWT used for stateless authentication
-- ✅ Authorization checks on protected routes
-- ✅ File uploads validated before storage
-- ✅ Database queries use parameterized statements
-- ✅ CORS configured for security
-
-## 📋 Project Info
+## 📚 Documentation
 
 <div align="center">
 
-| Aspect | Details |
-|--------|---------|
-| **Version** | 1.0.0 |
-| **Status** | ✅ Production Ready |
-| **Updated** | February 4, 2026 |
-| **Testing** | ✅ All CRUD verified |
-| **Database** | ✅ FreDB.tech (live) |
-| **Endpoints** | 16 API routes |
-| **License** | MIT |
+| Document | Description |
+|:--------:|:-----------:|
+| 📖 [documentation.txt](documentation.txt) | Complete API reference & examples |
+| 🚀 [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) | Deploy to Render, Heroku, Railway |
+| ⚡ [QUICK_DEPLOY.md](QUICK_DEPLOY.md) | Copy-paste deployment commands |
+| 📋 [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md) | Full project overview |
+| 🗂️ [INDEX.md](INDEX.md) | Documentation navigation |
 
 </div>
 
-## 📞 Support & Help
+---
 
-1. **Check Error Message** - Review console output for details
-2. **Review Examples** - See [test_api.js](test_api.js) for usage patterns
-3. **Check .env** - Verify configuration is correct
-4. **View Docs** - See [documentation.txt](documentation.txt) for detailed help
-5. **Check Logs** - MySQL connection and API errors shown in console
+## 📊 Project Stats
 
-## 🚀 Next Steps
+<div align="center">
 
-Ready to deploy? Follow these steps:
+![Version](https://img.shields.io/badge/Version-1.0.0-blue?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Production%20Ready-success?style=for-the-badge)
+![Database](https://img.shields.io/badge/Database-Live-green?style=for-the-badge)
+![Tests](https://img.shields.io/badge/Tests-Passing-brightgreen?style=for-the-badge)
 
-1. **Initialize Git Repository**
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit: CampusFind API"
-   git push origin main
-   ```
+**16 API Endpoints** • **6 Sample Users** • **13+ Items** • **6+ Claims**
 
-2. **Deploy to Production**
-   - See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) for Render/Heroku/Railway options
-   - Or use [QUICK_DEPLOY.md](QUICK_DEPLOY.md) for quick setup
+</div>
 
-3. **Test Live Application**
-   - Verify all endpoints respond correctly
-   - Test file uploads and authentication
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 📞 Support
+
+Need help? Here's what to do:
+
+1. 📖 Check the [documentation.txt](documentation.txt) for detailed API info
+2. 🧪 Review [test_api.js](test_api.js) for usage examples
+3. 🔍 Search existing issues on GitHub
+4. 🐛 Create a new issue with details
 
 ---
 
 <div align="center">
 
-### 🎓 Happy Campus Finding! 🎓
+<img src="https://user-images.githubusercontent.com/74038190/212284158-e840e285-664b-44d7-b79b-e264b5e54825.gif" width="400">
 
-**Built with ❤️ for college communities**
+### 🎓 Built with ❤️ for College Communities
 
-[⬆ Back to top](#campusfind---lost--found-system)
+**Making lost items found, one campus at a time**
+
+[![GitHub stars](https://img.shields.io/github/stars/yourusername/campusfind?style=social)](https://github.com/yourusername/campusfind)
+[![GitHub forks](https://img.shields.io/github/forks/yourusername/campusfind?style=social)](https://github.com/yourusername/campusfind/fork)
+
+[⬆️ Back to Top](#-campusfind)
+
+---
+
+*Last Updated: February 4, 2026*
 
 </div>
-#   c a m p u s f i n d 
- 
- 
