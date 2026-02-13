@@ -68,7 +68,7 @@ const login = async (req, res) => {
     const user = await User.findByEmail(email);
     
     if (user && (await User.comparePassword(password, user.password))) {
-      res.json({
+      res.status(200).json({
         message: 'Login successful',
         user: {
           id: user.id,
@@ -98,7 +98,13 @@ const login = async (req, res) => {
 const getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
-    res.json(user);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json({
+      success: true,
+      user
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });

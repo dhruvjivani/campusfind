@@ -1,0 +1,609 @@
+{
+  "info": {
+    "name": "CampusFind API",
+    "description": "Complete Lost & Found System API Documentation\n\n**Environment**: Use `{{BASE_URL}}` variable for API base URL\n- Production: https://campusfind-0463.onrender.com\n- Local: http://localhost:5000\n\n**Authentication**: Use Bearer token in Authorization header after login",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register New User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": \"S12345\",\n  \"email\": \"student@conestogac.on.ca\",\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\",\n  \"campus\": \"Main\",\n  \"program\": \"Mobile and Web Development\",\n  \"password\": \"SecurePassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/auth/register",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Register a new user account. Email must end with .on.ca to be verified.\n\n**Response Status**: 201 Created"
+          },
+          "response": []
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"student@conestogac.on.ca\",\n  \"password\": \"SecurePassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/auth/login",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Login and receive JWT token. Use the token in Authorization header for protected endpoints.\n\n**Response Status**: 200 OK\n\n**Token Usage**: \nAuthorization: Bearer <your_token_here>"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current User Info",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/auth/me",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "me"
+              ]
+            },
+            "description": "Get authenticated user's profile information.\n\n**Authentication**: Required (Bearer token)\n\n**Response Status**: 200 OK"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Items",
+      "item": [
+        {
+          "name": "Get All Items",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/api/items?category=electronics&campus=Main&status=found&search=phone&limit=10&page=1",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "items"
+              ],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "electronics",
+                  "disabled": true
+                },
+                {
+                  "key": "campus",
+                  "value": "Main",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "found",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "phone",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Retrieve all items with optional filtering and pagination.\n\n**Query Parameters**:\n- `category`: electronics | textbooks | keys | id_cards | clothing | bags | other\n- `campus`: Main | Waterloo | Cambridge\n- `status`: found | lost | claimed\n- `search`: Search in title and description\n- `limit`: Items per page (default: 20)\n- `page`: Page number (default: 1)\n\n**Response Status**: 200 OK"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Single Item",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/api/items/1",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "items",
+                "1"
+              ]
+            },
+            "description": "Get details of a specific item by ID. Includes user information who reported it.\n\n**Response Status**: 200 OK\n**Not Found**: 404"
+          },
+          "response": []
+        },
+        {
+          "name": "Report Found Item",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title",
+                  "value": "iPhone 14 Pro",
+                  "type": "text"
+                },
+                {
+                  "key": "category",
+                  "value": "electronics",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Found near library entrance, screen has small crack, has black case",
+                  "type": "text"
+                },
+                {
+                  "key": "location_found",
+                  "value": "Library Building - Main Entrance",
+                  "type": "text"
+                },
+                {
+                  "key": "campus",
+                  "value": "Main",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "disabled": true
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/items/found",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "items",
+                "found"
+              ]
+            },
+            "description": "Report a found item. Can optionally include an image.\n\n**Authentication**: Required (Bearer token)\n\n**Parameters**:\n- `title` (required): Item name\n- `category` (required): Item category\n- `description`: Detailed description\n- `location_found` (required): Where item was found\n- `campus` (required): Campus location\n- `image` (optional): Item photo (JPG, PNG, GIF, WebP, max 5MB)\n\n**Response Status**: 201 Created"
+          },
+          "response": []
+        },
+        {
+          "name": "Report Lost Item",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title",
+                  "value": "Samsung Galaxy Watch 5",
+                  "type": "text"
+                },
+                {
+                  "key": "category",
+                  "value": "electronics",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Lost watch with silver band. Serial number on back: SG5-2023-001",
+                  "type": "text"
+                },
+                {
+                  "key": "location_lost",
+                  "value": "Parking Lot B",
+                  "type": "text"
+                },
+                {
+                  "key": "campus",
+                  "value": "Main",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/items/lost",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "items",
+                "lost"
+              ]
+            },
+            "description": "Report a lost item. Status will be automatically set to 'lost'.\n\n**Authentication**: Required (Bearer token)\n\n**Parameters**:\n- `title` (required): Item name\n- `category` (required): Item category\n- `description`: Detailed description\n- `location_lost` (required): Where item was lost\n- `campus` (required): Campus location\n\n**Response Status**: 201 Created"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Item",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated iPhone 14 Pro\",\n  \"category\": \"electronics\",\n  \"description\": \"Updated description with more details\",\n  \"location_found\": \"Updated Location\",\n  \"campus\": \"Main\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/items/1",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "items",
+                "1"
+              ]
+            },
+            "description": "Update item details. User must be the item reporter or staff.\n\n**Authentication**: Required (Bearer token)\n**Authorization**: Owner or Staff role\n\n**Response Status**: 200 OK\n**Unauthorized**: 403\n**Not Found**: 404"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Item Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"claimed\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/items/1/status",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "items",
+                "1",
+                "status"
+              ]
+            },
+            "description": "Update item status. Staff only.\n\n**Authentication**: Required (Bearer token)\n**Authorization**: Staff role\n\n**Status Values**: found | lost | claimed\n\n**Response Status**: 200 OK\n**Unauthorized**: 403\n**Not Found**: 404"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Item",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/items/1",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "items",
+                "1"
+              ]
+            },
+            "description": "Delete an item. Staff only.\n\n**Authentication**: Required (Bearer token)\n**Authorization**: Staff role\n\n**Response Status**: 200 OK\n**Unauthorized**: 403\n**Not Found**: 404"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Claims",
+      "item": [
+        {
+          "name": "Create Claim",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"item_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/claims",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "claims"
+              ]
+            },
+            "description": "Submit a claim for a found item. Cannot claim items that are already claimed.\n\n**Authentication**: Required (Bearer token)\n\n**Parameters**:\n- `item_id` (required): ID of the item to claim\n\n**Response Status**: 201 Created\n**Bad Request**: 400 (Item already claimed)\n**Not Found**: 404"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Claim by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/claims/1",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "claims",
+                "1"
+              ]
+            },
+            "description": "Get details of a specific claim. User must be claimer, owner, or staff.\n\n**Authentication**: Required (Bearer token)\n**Authorization**: Claimer, Owner, or Staff\n\n**Response Status**: 200 OK\n**Unauthorized**: 403\n**Not Found**: 404"
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Claims",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/claims/user/my-claims",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "claims",
+                "user",
+                "my-claims"
+              ]
+            },
+            "description": "Get all claims submitted by the authenticated user (as claimer or owner).\n\n**Authentication**: Required (Bearer token)\n\n**Response Status**: 200 OK"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Item Claims",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/items/1/claims",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "items",
+                "1",
+                "claims"
+              ]
+            },
+            "description": "Get all claims for a specific item.\n\n**Authentication**: Required (Bearer token)\n\n**Response Status**: 200 OK"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Claim",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"verified\",\n  \"verification_notes\": \"User provided proof of ownership\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/claims/1",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "claims",
+                "1"
+              ]
+            },
+            "description": "Update claim details. Claimer can update, staff can update any claim.\n\n**Authentication**: Required (Bearer token)\n**Authorization**: Claimer or Staff\n\n**Parameters**:\n- `status`: pending | verified | rejected | completed\n- `verification_notes`: Notes about the verification\n\n**Response Status**: 200 OK\n**Bad Request**: 400\n**Unauthorized**: 403\n**Not Found**: 404"
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Claim (Staff)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"verified\",\n  \"verification_notes\": \"Student verified ownership by providing receipt and matching serial number\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/claims/1/verify",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "claims",
+                "1",
+                "verify"
+              ]
+            },
+            "description": "Verify or reject a claim. Staff only endpoint.\n\n**Authentication**: Required (Bearer token)\n**Authorization**: Staff role\n\n**Parameters**:\n- `status` (required): verified | rejected | completed\n- `verification_notes`: Reason for decision\n\n**Response Status**: 200 OK\n**Bad Request**: 400\n**Unauthorized**: 403\n**Not Found**: 404"
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Claim (Delete)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/claims/1",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "api",
+                "claims",
+                "1"
+              ]
+            },
+            "description": "Cancel a pending claim. Can only delete claims in 'pending' status.\n\n**Authentication**: Required (Bearer token)\n**Authorization**: Claimer or Staff\n\n**Response Status**: 200 OK\n**Bad Request**: 400 (Claim is not pending)\n**Unauthorized**: 403\n**Not Found**: 404"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "BASE_URL",
+      "value": "https://campusfind-0463.onrender.com",
+      "type": "string"
+    },
+    {
+      "key": "TOKEN",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

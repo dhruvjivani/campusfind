@@ -29,8 +29,9 @@ const createClaim = async (req, res) => {
     const claim = await Claim.create(claimData);
     
     res.status(201).json({
+      success: true,
       message: 'Claim submitted successfully',
-      claim
+      data: claim
     });
   } catch (error) {
     console.error(error);
@@ -54,7 +55,10 @@ const getClaim = async (req, res) => {
       return res.status(403).json({ message: 'Not authorized to view this claim' });
     }
     
-    res.json(claim);
+    res.status(200).json({
+      success: true,
+      data: claim
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
@@ -78,9 +82,10 @@ const verifyClaim = async (req, res) => {
       return res.status(404).json({ message: 'Claim not found' });
     }
     
-    res.json({
+    res.status(200).json({
+      success: true,
       message: 'Claim verification updated successfully',
-      claim
+      data: claim
     });
   } catch (error) {
     console.error(error);
@@ -95,7 +100,7 @@ const getUserClaims = async (req, res) => {
   try {
     const claims = await Claim.getUserClaims(req.user.id);
     
-    res.json({
+    res.status(200).json({
       success: true,
       count: claims.length,
       data: claims
@@ -113,7 +118,7 @@ const getItemClaims = async (req, res) => {
   try {
     const claims = await Claim.findByItemId(req.params.id);
     
-    res.json({
+    res.status(200).json({
       success: true,
       count: claims.length,
       data: claims
@@ -152,9 +157,10 @@ const updateClaim = async (req, res) => {
       verification_notes: verification_notes || claim.verification_notes
     });
     
-    res.json({
+    res.status(200).json({
+      success: true,
       message: 'Claim updated successfully',
-      claim: updatedClaim
+      data: updatedClaim
     });
   } catch (error) {
     console.error(error);
@@ -189,7 +195,10 @@ const deleteClaim = async (req, res) => {
       return res.status(404).json({ message: 'Claim not found' });
     }
     
-    res.json({ message: 'Claim deleted successfully' });
+    res.status(200).json({ 
+      success: true,
+      message: 'Claim deleted successfully' 
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });

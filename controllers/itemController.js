@@ -23,7 +23,7 @@ const getItems = async (req, res) => {
     const countFilters = { category, campus, status, search };
     const allItems = await Item.findAll(countFilters);
     
-    res.json({
+    res.status(200).json({
       success: true,
       count: items.length,
       total: allItems.length,
@@ -48,7 +48,10 @@ const getItem = async (req, res) => {
       return res.status(404).json({ message: 'Item not found' });
     }
     
-    res.json(item);
+    res.status(200).json({
+      success: true,
+      data: item
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
@@ -79,8 +82,9 @@ const reportFoundItem = async (req, res) => {
     const item = await Item.create(itemData);
     
     res.status(201).json({
+      success: true,
       message: 'Item reported successfully',
-      item
+      data: item
     });
   } catch (error) {
     console.error(error);
@@ -109,8 +113,9 @@ const reportLostItem = async (req, res) => {
     const item = await Item.create(itemData);
     
     res.status(201).json({
+      success: true,
       message: 'Lost item reported successfully',
-      item
+      data: item
     });
   } catch (error) {
     console.error(error);
@@ -144,9 +149,10 @@ const updateItem = async (req, res) => {
       campus: campus || item.campus
     });
     
-    res.json({
+    res.status(200).json({
+      success: true,
       message: 'Item updated successfully',
-      item: updatedItem
+      data: updatedItem
     });
   } catch (error) {
     console.error(error);
@@ -167,9 +173,10 @@ const updateItemStatus = async (req, res) => {
       return res.status(404).json({ message: 'Item not found' });
     }
     
-    res.json({
+    res.status(200).json({
+      success: true,
       message: 'Item status updated successfully',
-      item
+      data: item
     });
   } catch (error) {
     console.error(error);
@@ -188,7 +195,10 @@ const deleteItem = async (req, res) => {
       return res.status(404).json({ message: 'Item not found' });
     }
     
-    res.json({ message: 'Item deleted successfully' });
+    res.status(200).json({ 
+      success: true,
+      message: 'Item deleted successfully' 
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
