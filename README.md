@@ -117,6 +117,10 @@ npm start
 ```
 
 > 🎉 Production URL: **`https://campusfind-0463.onrender.com`**
+> 
+> 📚 **API Documentation:**
+> - **Swagger/OpenAPI:** https://campusfind-0463.onrender.com/api-docs
+> - **Postman Collection:** See CampusFind_API_Postman_Collection.json
 
 <details>
 <summary><b>Local Development</b></summary>
@@ -127,6 +131,8 @@ For local testing with auto-reload:
 ```bash
 npm run dev
 ```
+
+Access Swagger at: http://localhost:5000/api-docs
 
 </details>
 

@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./config/swagger');
 require('dotenv').config();
 
 // Route imports
@@ -19,11 +21,28 @@ app.use(express.urlencoded({ extended: true }));
 // Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Swagger API Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  swaggerOptions: {
+    url: '/swagger.json'
+  }
+}));
+
+// Swagger JSON endpoint
+app.get('/swagger.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
+
 // Test route
 app.get('/', (req, res) => {
   res.json({
     message: 'CampusFind API is running',
     version: '1.0.0',
+    documentation: {
+      swagger: '/api-docs',
+      postman: 'See CampusFind_API_Postman_Collection.json'
+    },
     endpoints: {
       auth: '/api/auth',
       items: '/api/items',
@@ -57,4 +76,5 @@ app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📁 Production URL: https://campusfind-0463.onrender.com`);
   console.log(`🔗 API endpoint: https://campusfind-0463.onrender.com/api/items`);
+  console.log(`📚 Swagger Docs: https://campusfind-0463.onrender.com/api-docs`);
 });
