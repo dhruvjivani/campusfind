@@ -97,13 +97,13 @@ const reportFoundItem = async (req, res) => {
 // @access  Private
 const reportLostItem = async (req, res) => {
   try {
-    const { title, category, description, location_lost, campus } = req.body;
-    
+    const { title, category, description, location_lost, location_found, campus } = req.body;
+
     const itemData = {
       title,
       category,
       description,
-      location_found: location_lost,
+      location_found: location_found || location_lost,
       campus,
       status: 'lost',
       image_url: req.file ? `/uploads/${req.file.filename}` : null,
