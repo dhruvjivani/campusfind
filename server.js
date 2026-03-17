@@ -34,27 +34,21 @@ app.get('/swagger.json', (req, res) => {
   res.send(swaggerSpec);
 });
 
-// Test route
-app.get('/', (req, res) => {
-  res.json({
-    message: 'CampusFind API is running',
-    version: '1.0.0',
-    documentation: {
-      swagger: '/api-docs',
-      postman: 'See CampusFind_API_Postman_Collection.json'
-    },
-    endpoints: {
-      auth: '/api/auth',
-      items: '/api/items',
-      claims: '/api/claims'
-    }
-  });
-});
+// Serve static files from public folder
+app.use(express.static(path.join(__dirname, 'public')));
 
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/items', itemRoutes);
 app.use('/api/claims', claimRoutes);
+
+// Serve React app for all other routes
+app.get('*', (req, res) => {
+  // Check if it's an API call by checking the path
+  if (!req.path.startsWith('/api')) {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  }
+});
 
 // 404 handler
 app.use((req, res) => {
