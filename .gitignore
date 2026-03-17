@@ -63,5 +63,5 @@ typings/
 # uploads/
 .vscode/
 campusfind/
-app.js
+/app.js
 test_db_connection.js
