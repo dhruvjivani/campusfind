@@ -1,8 +1,16 @@
-// Main React App with all components
+// ============================================================
+// CampusFind - React SPA
+// Sprint 2: React Basics, State Management, Forms
+// ============================================================
 
+// Destructure React hooks at the top (React 18 via CDN)
 const { useState, useEffect } = React;
 
-// ===== NAVBAR COMPONENT =====
+// ============================================================
+// NAVBAR COMPONENT
+// Props: user (object|null), onLogout (fn), onNavigate (fn)
+// Conditionally renders links based on auth state
+// ============================================================
 function Navbar({ user, onLogout, onNavigate }) {
   return (
     <nav>
@@ -11,9 +19,10 @@ function Navbar({ user, onLogout, onNavigate }) {
           🎓 CampusFind
         </h1>
         <ul className="nav-links">
+          {/* Show different nav links based on whether user is logged in */}
           {user ? (
             <>
-              <button onClick={() => onNavigate('browse')}>🔍 Browse Items</button>
+              <button onClick={() => onNavigate('browse')}>🔍 Browse</button>
               <button onClick={() => onNavigate('post')}>📝 Post Item</button>
               <button onClick={() => onNavigate('myclaims')}>📋 My Claims</button>
               <button onClick={onLogout}>🚪 Logout</button>
@@ -32,29 +41,37 @@ function Navbar({ user, onLogout, onNavigate }) {
   );
 }
 
-// ===== LOGIN COMPONENT =====
+// ============================================================
+// LOGIN COMPONENT
+// Controlled form using useState
+// Calls apiService.login() on submit, stores JWT token
+// ============================================================
 function Login({ onNavigate, onLoginSuccess }) {
+  // State for form fields
   const [formData, setFormData] = useState({ email: '', password: '' });
+  // State for error message and loading indicator
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Generic change handler — updates matching key in formData
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Form submit handler — async API call with error handling
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault();   // prevent page reload
     setLoading(true);
     setError('');
 
     try {
       const response = await apiService.login(formData);
-      apiService.setToken(response.token);
+      apiService.setToken(response.token);   // persist JWT in localStorage
       onLoginSuccess(response.user);
       onNavigate('home');
     } catch (err) {
-      setError(err.message || 'Login failed');
+      setError(err.message || 'Login failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }
@@ -94,16 +111,17 @@ function Login({ onNavigate, onLoginSuccess }) {
         </form>
         <div className="auth-link">
           Don't have an account?{' '}
-          <button onClick={() => onNavigate('register')}>
-            Register here
-          </button>
+          <button onClick={() => onNavigate('register')}>Register here</button>
         </div>
       </div>
     </div>
   );
 }
 
-// ===== REGISTER COMPONENT =====
+// ============================================================
+// REGISTER COMPONENT
+// Controlled form with client-side password match validation
+// ============================================================
 function Register({ onNavigate, onLoginSuccess }) {
   const [formData, setFormData] = useState({
     email: '',
@@ -123,13 +141,13 @@ function Register({ onNavigate, onLoginSuccess }) {
     e.preventDefault();
     setError('');
 
+    // Client-side validation before hitting the API
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       return;
     }
 
     setLoading(true);
-
     try {
       const response = await apiService.register({
         email: formData.email,
@@ -140,7 +158,7 @@ function Register({ onNavigate, onLoginSuccess }) {
       onLoginSuccess(response.user);
       onNavigate('home');
     } catch (err) {
-      setError(err.message || 'Registration failed');
+      setError(err.message || 'Registration failed. Email may already be in use.');
     } finally {
       setLoading(false);
     }
@@ -149,7 +167,7 @@ function Register({ onNavigate, onLoginSuccess }) {
   return (
     <div className="auth-container">
       <div className="auth-box">
-        <h2>📝 Register for CampusFind</h2>
+        <h2>📝 Create an Account</h2>
         {error && <div className="alert error">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
@@ -182,7 +200,7 @@ function Register({ onNavigate, onLoginSuccess }) {
               value={formData.password}
               onChange={handleChange}
               required
-              placeholder="Create a password"
+              placeholder="Create a password (min 6 characters)"
             />
           </div>
           <div className="form-group">
@@ -193,28 +211,55 @@ function Register({ onNavigate, onLoginSuccess }) {
               value={formData.confirmPassword}
               onChange={handleChange}
               required
-              placeholder="Confirm your password"
+              placeholder="Re-enter your password"
             />
           </div>
           <button type="submit" disabled={loading} style={{ width: '100%' }}>
-            {loading ? 'Registering...' : 'Register'}
+            {loading ? 'Creating account...' : 'Register'}
           </button>
         </form>
         <div className="auth-link">
           Already have an account?{' '}
-          <button onClick={() => onNavigate('login')}>
-            Login here
-          </button>
+          <button onClick={() => onNavigate('login')}>Login here</button>
         </div>
       </div>
     </div>
   );
 }
 
-// ===== HOME COMPONENT =====
+// ============================================================
+// HOME COMPONENT
+// Landing page — shows live item stats and quick-action buttons
+// Uses useEffect to fetch stats on mount
+// ============================================================
 function Home({ onNavigate, user }) {
+  // State to hold item counts fetched from the API
+  const [stats, setStats] = useState({ total: 0, lost: 0, found: 0 });
+
+  // useEffect runs once on mount to load stats
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const [allRes, lostRes, foundRes] = await Promise.all([
+          apiService.getItems({}),
+          apiService.getItems({ status: 'lost' }),
+          apiService.getItems({ status: 'found' }),
+        ]);
+        setStats({
+          total: allRes.total || 0,
+          lost: lostRes.total || 0,
+          found: foundRes.total || 0,
+        });
+      } catch (err) {
+        // Stats are non-critical — fail silently
+      }
+    };
+    loadStats();
+  }, []);
+
   return (
     <div className="container">
+      {/* Hero Section */}
       <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
         <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem', color: '#2c3e50' }}>
           🎓 Welcome to CampusFind
@@ -222,6 +267,8 @@ function Home({ onNavigate, user }) {
         <p style={{ fontSize: '1.1rem', color: '#7f8c8d', marginBottom: '2rem' }}>
           Lost something on campus? Help someone find theirs!
         </p>
+
+        {/* Action buttons — differ based on auth state */}
         {user ? (
           <div>
             <button onClick={() => onNavigate('browse')} style={{ marginRight: '1rem' }}>
@@ -246,34 +293,63 @@ function Home({ onNavigate, user }) {
         )}
       </div>
 
+      {/* Live Stats */}
       <div className="grid" style={{ marginBottom: '2rem' }}>
+        <div className="card" style={{ textAlign: 'center' }}>
+          <h2 style={{ fontSize: '2.5rem', color: '#3498db' }}>{stats.total}</h2>
+          <p style={{ color: '#7f8c8d' }}>Total Items Listed</p>
+        </div>
+        <div className="card" style={{ textAlign: 'center' }}>
+          <h2 style={{ fontSize: '2.5rem', color: '#e74c3c' }}>{stats.lost}</h2>
+          <p style={{ color: '#7f8c8d' }}>Items Reported Lost</p>
+        </div>
+        <div className="card" style={{ textAlign: 'center' }}>
+          <h2 style={{ fontSize: '2.5rem', color: '#27ae60' }}>{stats.found}</h2>
+          <p style={{ color: '#7f8c8d' }}>Items Found & Listed</p>
+        </div>
+      </div>
+
+      {/* Feature Highlights */}
+      <div className="grid">
         <div className="card">
           <h3>🔍 Search Items</h3>
-          <p>Browse all lost and found items on campus. Filter by category, location, or status.</p>
+          <p>Browse all lost and found items. Filter by category, status, or search by keyword.</p>
         </div>
         <div className="card">
           <h3>📝 Post Items</h3>
-          <p>Report a lost item or post a found item to help reunite belongings with their owners.</p>
+          <p>Report a lost item or post something you found to reunite it with its owner.</p>
         </div>
         <div className="card">
           <h3>✅ Claim Verification</h3>
-          <p>Our secure claim and verification system ensures items reach their rightful owners.</p>
+          <p>Submit a claim with proof of ownership. Staff verify and approve claims securely.</p>
         </div>
       </div>
     </div>
   );
 }
 
-// ===== BROWSE ITEMS COMPONENT =====
+// ============================================================
+// BROWSE ITEMS COMPONENT
+// Fetches items from API with filters + keyword search
+// useEffect re-runs whenever filters change (reactive)
+// ============================================================
 function BrowseItems({ onNavigate, user }) {
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState([]);       // array of item objects
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [totalCount, setTotalCount] = useState(0);
+
+  // Filter state — each key maps to a query param in the API
   const [filters, setFilters] = useState({
     status: '',
     category: '',
+    search: '',
   });
 
+  // Temporary search input value (only applied on submit)
+  const [searchInput, setSearchInput] = useState('');
+
+  // Re-fetch whenever filters change
   useEffect(() => {
     loadItems();
   }, [filters]);
@@ -284,29 +360,61 @@ function BrowseItems({ onNavigate, user }) {
     try {
       const response = await apiService.getItems(filters);
       setItems(response.data || []);
+      setTotalCount(response.total || 0);
     } catch (err) {
-      setError(err.message);
+      setError('Failed to load items. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
+  // Dropdown filter change handler
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters(prev => ({ ...prev, [name]: value }));
+  };
+
+  // Apply keyword search on form submit
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    setFilters(prev => ({ ...prev, search: searchInput }));
+  };
+
+  // Clear all filters and search
+  const handleClearFilters = () => {
+    setFilters({ status: '', category: '', search: '' });
+    setSearchInput('');
   };
 
   return (
     <div className="container">
       <h2>🔍 Browse Items</h2>
 
+      {/* Search and Filter Panel */}
       <div className="filters">
-        <h3>Filters</h3>
+        {/* Keyword Search */}
+        <form onSubmit={handleSearchSubmit} style={{ marginBottom: '1rem', display: 'flex', gap: '0.5rem' }}>
+          <input
+            type="text"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            placeholder="Search by name or description..."
+            style={{ flex: 1 }}
+          />
+          <button type="submit">Search</button>
+          {(filters.search || filters.status || filters.category) && (
+            <button type="button" onClick={handleClearFilters} className="secondary">
+              Clear
+            </button>
+          )}
+        </form>
+
+        {/* Dropdown Filters */}
         <div className="filters-grid">
           <div className="form-group">
             <label>Status</label>
             <select name="status" value={filters.status} onChange={handleFilterChange}>
-              <option value="">All</option>
+              <option value="">All Statuses</option>
               <option value="lost">Lost</option>
               <option value="found">Found</option>
             </select>
@@ -330,6 +438,15 @@ function BrowseItems({ onNavigate, user }) {
 
       {error && <div className="alert error">{error}</div>}
 
+      {/* Results count */}
+      {!loading && (
+        <p style={{ color: '#7f8c8d', marginBottom: '1rem' }}>
+          Showing {items.length} of {totalCount} item(s)
+          {filters.search && ` matching "${filters.search}"`}
+        </p>
+      )}
+
+      {/* Loading / Empty / Grid */}
       {loading ? (
         <div className="loading">
           <div className="spinner"></div>
@@ -337,7 +454,10 @@ function BrowseItems({ onNavigate, user }) {
         </div>
       ) : items.length === 0 ? (
         <div className="empty-state">
-          <p>No items found matching your filters.</p>
+          <p>No items found. Try adjusting your filters.</p>
+          <button onClick={handleClearFilters} style={{ marginTop: '1rem' }}>
+            Clear Filters
+          </button>
         </div>
       ) : (
         <div className="grid">
@@ -371,13 +491,18 @@ function BrowseItems({ onNavigate, user }) {
   );
 }
 
-// ===== ITEM DETAIL COMPONENT =====
+// ============================================================
+// ITEM DETAIL COMPONENT
+// Fetches a single item by ID — shows full details + claim button
+// ============================================================
 function ItemDetail({ itemId, onNavigate, user }) {
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showClaimForm, setShowClaimForm] = useState(false);
+  const [claimSuccess, setClaimSuccess] = useState('');
 
+  // Fetch item on mount or when itemId changes
   useEffect(() => {
     loadItem();
   }, [itemId]);
@@ -389,7 +514,7 @@ function ItemDetail({ itemId, onNavigate, user }) {
       const response = await apiService.getItemById(itemId);
       setItem(response.data);
     } catch (err) {
-      setError(err.message);
+      setError('Could not load item. It may have been removed.');
     } finally {
       setLoading(false);
     }
@@ -398,10 +523,7 @@ function ItemDetail({ itemId, onNavigate, user }) {
   if (loading) {
     return (
       <div className="container">
-        <div className="loading">
-          <div className="spinner"></div>
-          <p>Loading item...</p>
-        </div>
+        <div className="loading"><div className="spinner"></div><p>Loading...</p></div>
       </div>
     );
   }
@@ -409,7 +531,7 @@ function ItemDetail({ itemId, onNavigate, user }) {
   if (error || !item) {
     return (
       <div className="container">
-        <div className="alert error">{error || 'Item not found'}</div>
+        <div className="alert error">{error || 'Item not found.'}</div>
         <button onClick={() => onNavigate('browse')}>← Back to Browse</button>
       </div>
     );
@@ -417,7 +539,7 @@ function ItemDetail({ itemId, onNavigate, user }) {
 
   return (
     <div className="container">
-      <button onClick={() => onNavigate('browse')} className="secondary" style={{ marginBottom: '1rem' }}>
+      <button onClick={() => onNavigate('browse')} className="secondary" style={{ marginBottom: '1.5rem' }}>
         ← Back to Browse
       </button>
 
@@ -436,47 +558,48 @@ function ItemDetail({ itemId, onNavigate, user }) {
           </span>
         </div>
 
-        <p style={{ marginBottom: '1rem' }}>{item.description}</p>
+        <p style={{ marginBottom: '1.5rem', color: '#555' }}>{item.description}</p>
 
         <div className="card-meta" style={{ marginBottom: '1.5rem' }}>
-          <span>📁 Category: {item.category}</span>
-          <span>📍 Location: {item.location_found}</span>
-          <span>🏫 Campus: {item.campus}</span>
-          <span>📅 Date: {new Date(item.created_at).toLocaleDateString()}</span>
+          <span>📁 <strong>Category:</strong> {item.category}</span>
+          <span>📍 <strong>Location:</strong> {item.location_found}</span>
+          <span>🏫 <strong>Campus:</strong> {item.campus}</span>
+          <span>📅 <strong>Posted:</strong> {new Date(item.created_at).toLocaleDateString()}</span>
           {item.first_name && (
-            <span>👤 Posted by: {item.first_name} {item.last_name}</span>
+            <span>👤 <strong>By:</strong> {item.first_name} {item.last_name}</span>
           )}
         </div>
 
+        {claimSuccess && <div className="alert success">{claimSuccess}</div>}
+
+        {/* Claim button — only shown when appropriate */}
         {user && item.status !== 'claimed' && item.user_id !== user.id && (
           <button onClick={() => setShowClaimForm(true)} className="success">
             📋 Claim This Item
           </button>
         )}
-
         {!user && (
           <div className="alert info">
-            <button
-              onClick={() => onNavigate('login')}
+            <button onClick={() => onNavigate('login')}
               style={{ background: 'none', textDecoration: 'underline', cursor: 'pointer', color: 'inherit', border: 'none', padding: 0 }}>
               Login
-            </button>
-            {' '}to claim this item.
+            </button>{' '}to claim this item.
           </div>
         )}
-
         {item.status === 'claimed' && (
           <div className="alert info">This item has already been claimed.</div>
         )}
       </div>
 
+      {/* Claim modal rendered on top when triggered */}
       {showClaimForm && (
         <ClaimItem
           itemId={itemId}
           onClose={() => setShowClaimForm(false)}
           onClaimSuccess={() => {
             setShowClaimForm(false);
-            loadItem();
+            setClaimSuccess('Claim submitted successfully! We will review it shortly.');
+            loadItem();   // refresh item status
           }}
         />
       )}
@@ -484,7 +607,11 @@ function ItemDetail({ itemId, onNavigate, user }) {
   );
 }
 
-// ===== POST ITEM COMPONENT =====
+// ============================================================
+// POST ITEM COMPONENT
+// Controlled form — posts to /api/items/found or /api/items/lost
+// based on the status dropdown selection
+// ============================================================
 function PostItem({ onNavigate }) {
   const [formData, setFormData] = useState({
     title: '',
@@ -510,19 +637,13 @@ function PostItem({ onNavigate }) {
     setLoading(true);
 
     try {
+      // apiService.createItem routes to /items/found or /items/lost based on status
       await apiService.createItem(formData);
-      setSuccess('Item posted successfully!');
-      setFormData({
-        title: '',
-        description: '',
-        category: '',
-        status: 'lost',
-        location_found: '',
-        campus: 'Main Campus',
-      });
+      setSuccess('Item posted successfully! Redirecting to browse...');
+      setFormData({ title: '', description: '', category: '', status: 'lost', location_found: '', campus: 'Main Campus' });
       setTimeout(() => onNavigate('browse'), 2000);
     } catch (err) {
-      setError(err.message || 'Failed to post item');
+      setError(err.message || 'Failed to post item. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -532,6 +653,9 @@ function PostItem({ onNavigate }) {
     <div className="container">
       <div className="form-container">
         <h2>📝 Post an Item</h2>
+        <p style={{ color: '#7f8c8d', marginBottom: '1.5rem' }}>
+          Report something you lost or found on campus.
+        </p>
 
         {error && <div className="alert error">{error}</div>}
         {success && <div className="alert success">{success}</div>}
@@ -545,7 +669,7 @@ function PostItem({ onNavigate }) {
               value={formData.title}
               onChange={handleChange}
               required
-              placeholder="e.g., Blue Backpack"
+              placeholder="e.g., Blue JanSport Backpack"
             />
           </div>
 
@@ -556,7 +680,7 @@ function PostItem({ onNavigate }) {
               value={formData.description}
               onChange={handleChange}
               required
-              placeholder="Describe the item in detail..."
+              placeholder="Describe the item — colour, size, identifying marks..."
             ></textarea>
           </div>
 
@@ -591,23 +715,21 @@ function PostItem({ onNavigate }) {
               value={formData.location_found}
               onChange={handleChange}
               required
-              placeholder="e.g., Library, Building A, Campus East"
+              placeholder="e.g., Library 2nd Floor, Parking Lot B"
             />
           </div>
 
           <div className="form-group">
             <label>Campus</label>
-            <input
-              type="text"
-              name="campus"
-              value={formData.campus}
-              onChange={handleChange}
-              placeholder="e.g., Main Campus"
-            />
+            <select name="campus" value={formData.campus} onChange={handleChange}>
+              <option value="Main Campus">Main Campus</option>
+              <option value="Waterloo">Waterloo</option>
+              <option value="Cambridge">Cambridge</option>
+            </select>
           </div>
 
           <button type="submit" disabled={loading} style={{ width: '100%' }}>
-            {loading ? 'Posting...' : 'Post Item'}
+            {loading ? 'Posting...' : '📤 Post Item'}
           </button>
         </form>
       </div>
@@ -615,18 +737,14 @@ function PostItem({ onNavigate }) {
   );
 }
 
-// ===== CLAIM ITEM COMPONENT (MODAL) =====
+// ============================================================
+// CLAIM ITEM MODAL COMPONENT
+// Overlay modal — submits a claim for a specific item
+// ============================================================
 function ClaimItem({ itemId, onClose, onClaimSuccess }) {
-  const [formData, setFormData] = useState({
-    verification_notes: '',
-  });
+  const [notes, setNotes] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -636,12 +754,11 @@ function ClaimItem({ itemId, onClose, onClaimSuccess }) {
     try {
       const response = await apiService.createClaim({
         item_id: itemId,
-        ...formData,
+        verification_notes: notes,
       });
       if (onClaimSuccess) onClaimSuccess(response.data);
-      onClose();
     } catch (err) {
-      setError(err.message || 'Failed to submit claim');
+      setError(err.message || 'Failed to submit claim. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -649,32 +766,28 @@ function ClaimItem({ itemId, onClose, onClaimSuccess }) {
 
   return (
     <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
+      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
       backgroundColor: 'rgba(0,0,0,0.5)',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
+      display: 'flex', justifyContent: 'center', alignItems: 'center',
       zIndex: 1000,
     }}>
-      <div className="form-container" style={{ maxWidth: '500px', width: '90%' }}>
-        <h2>📋 Claim This Item</h2>
+      <div className="form-container" style={{ maxWidth: '500px', width: '90%', margin: 0 }}>
+        <h2>📋 Submit a Claim</h2>
+        <p style={{ color: '#7f8c8d', marginBottom: '1rem' }}>
+          Describe why you believe this item is yours. Include serial numbers, initials, or other identifying details.
+        </p>
 
         {error && <div className="alert error">{error}</div>}
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Describe why this item is yours *</label>
+            <label>Proof of Ownership *</label>
             <textarea
-              name="verification_notes"
-              value={formData.verification_notes}
-              onChange={handleChange}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
               required
-              placeholder="Describe distinctive features, serial numbers, initials, where you last had it, etc."
-              rows="4"
+              rows="5"
+              placeholder="e.g., Serial number: ABC123, initials 'DJ' on the inside tag, bought it from Staples last September..."
             ></textarea>
           </div>
 
@@ -692,12 +805,16 @@ function ClaimItem({ itemId, onClose, onClaimSuccess }) {
   );
 }
 
-// ===== MY CLAIMS COMPONENT =====
+// ============================================================
+// MY CLAIMS COMPONENT
+// Fetches the logged-in user's submitted claims from the API
+// ============================================================
 function MyClaims({ onNavigate }) {
   const [claims, setClaims] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Load claims on mount
   useEffect(() => {
     loadClaims();
   }, []);
@@ -706,36 +823,33 @@ function MyClaims({ onNavigate }) {
     setLoading(true);
     setError('');
     try {
+      // GET /api/claims/user/my-claims — returns claims for the logged-in user
       const response = await apiService.getMyClaims();
       setClaims(response.data || []);
     } catch (err) {
-      setError(err.message);
+      setError('Failed to load claims. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
+  // Map claim status to badge CSS class
   const getStatusClass = (status) => {
-    const map = {
-      pending: 'pending',
-      verified: 'found',
-      rejected: 'lost',
-      completed: 'claimed',
-    };
+    const map = { pending: 'pending', verified: 'found', rejected: 'lost', completed: 'claimed' };
     return map[status] || 'pending';
   };
 
   return (
     <div className="container">
       <h2>📋 My Claims</h2>
+      <p style={{ color: '#7f8c8d', marginBottom: '1.5rem' }}>
+        Track the status of items you have claimed.
+      </p>
 
       {error && <div className="alert error">{error}</div>}
 
       {loading ? (
-        <div className="loading">
-          <div className="spinner"></div>
-          <p>Loading your claims...</p>
-        </div>
+        <div className="loading"><div className="spinner"></div><p>Loading your claims...</p></div>
       ) : claims.length === 0 ? (
         <div className="empty-state">
           <p>You haven't submitted any claims yet.</p>
@@ -751,19 +865,18 @@ function MyClaims({ onNavigate }) {
                 <img src={claim.item_image} alt={claim.item_title} className="card-image" />
               )}
               <div className="card-header">
-                <div>
-                  <h3 className="card-title">{claim.item_title || 'Item'}</h3>
-                </div>
+                <h3 className="card-title">{claim.item_title || 'Item'}</h3>
                 <span className={`badge ${getStatusClass(claim.status)}`}>
                   {claim.status.toUpperCase()}
                 </span>
               </div>
               {claim.verification_notes && (
-                <p><strong>Notes:</strong> {claim.verification_notes}</p>
+                <p style={{ marginBottom: '0.5rem' }}>
+                  <strong>Your notes:</strong> {claim.verification_notes}
+                </p>
               )}
               <div className="card-meta">
-                <span>📅 {new Date(claim.created_at).toLocaleDateString()}</span>
-                <span>📊 Status: {claim.status}</span>
+                <span>📅 Submitted: {new Date(claim.created_at).toLocaleDateString()}</span>
               </div>
             </div>
           ))}
@@ -773,12 +886,35 @@ function MyClaims({ onNavigate }) {
   );
 }
 
-// ===== MAIN APP COMPONENT =====
+// ============================================================
+// AUTH REQUIRED — shown when a page needs login
+// ============================================================
+function AuthRequired({ onNavigate }) {
+  return (
+    <div className="container" style={{ paddingTop: '2rem' }}>
+      <div className="alert info">
+        You must be logged in to access this page.{' '}
+        <button
+          onClick={() => onNavigate('login')}
+          style={{ background: 'none', textDecoration: 'underline', cursor: 'pointer', color: 'inherit', border: 'none', padding: 0 }}>
+          Click here to login
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// APP (ROOT COMPONENT)
+// Manages global state: current page, logged-in user
+// Acts as the router — renders the right component based on currentPage
+// ============================================================
 function App() {
-  const [currentPage, setCurrentPage] = useState('home');
-  const [user, setUser] = useState(null);
+  const [currentPage, setCurrentPage] = useState('home');  // active "route"
+  const [user, setUser] = useState(null);                   // logged-in user or null
   const [selectedItemId, setSelectedItemId] = useState(null);
 
+  // On first load — check if a JWT token exists and restore session
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -786,20 +922,21 @@ function App() {
     }
   }, []);
 
+  // Fetch user profile using stored JWT token
   const loadUserProfile = async () => {
     try {
-      const response = await apiService.getMyProfile();
+      const response = await apiService.getMyProfile();  // GET /api/auth/me
       setUser(response.user);
     } catch (err) {
+      // Token invalid or expired — clear it
       localStorage.removeItem('token');
     }
   };
 
+  // Navigation handler — updates currentPage state (no page reloads)
   const handleNavigate = (page, itemId = null) => {
     setCurrentPage(page);
-    if (itemId) {
-      setSelectedItemId(itemId);
-    }
+    if (itemId) setSelectedItemId(itemId);
   };
 
   const handleLoginSuccess = (userData) => {
@@ -808,35 +945,28 @@ function App() {
   };
 
   const handleLogout = () => {
-    apiService.logout();
+    apiService.logout();   // clears token from localStorage
     setUser(null);
     setCurrentPage('home');
   };
 
+  // Route switcher — renders the matching component for currentPage
   const renderPage = () => {
     switch (currentPage) {
       case 'home':
         return <Home onNavigate={handleNavigate} user={user} />;
       case 'login':
-        return user
-          ? <Home onNavigate={handleNavigate} user={user} />
-          : <Login onNavigate={handleNavigate} onLoginSuccess={handleLoginSuccess} />;
+        return user ? <Home onNavigate={handleNavigate} user={user} /> : <Login onNavigate={handleNavigate} onLoginSuccess={handleLoginSuccess} />;
       case 'register':
-        return user
-          ? <Home onNavigate={handleNavigate} user={user} />
-          : <Register onNavigate={handleNavigate} onLoginSuccess={handleLoginSuccess} />;
+        return user ? <Home onNavigate={handleNavigate} user={user} /> : <Register onNavigate={handleNavigate} onLoginSuccess={handleLoginSuccess} />;
       case 'browse':
         return <BrowseItems onNavigate={handleNavigate} user={user} />;
       case 'itemdetail':
         return <ItemDetail itemId={selectedItemId} onNavigate={handleNavigate} user={user} />;
       case 'post':
-        return user
-          ? <PostItem onNavigate={handleNavigate} />
-          : <AuthRequired onNavigate={handleNavigate} />;
+        return user ? <PostItem onNavigate={handleNavigate} /> : <AuthRequired onNavigate={handleNavigate} />;
       case 'myclaims':
-        return user
-          ? <MyClaims onNavigate={handleNavigate} />
-          : <AuthRequired onNavigate={handleNavigate} />;
+        return user ? <MyClaims onNavigate={handleNavigate} /> : <AuthRequired onNavigate={handleNavigate} />;
       default:
         return <Home onNavigate={handleNavigate} user={user} />;
     }
@@ -844,41 +974,11 @@ function App() {
 
   return (
     <>
-      <Navbar
-        user={user}
-        onLogout={handleLogout}
-        onNavigate={handleNavigate}
-      />
-      <div>
-        {renderPage()}
-      </div>
+      <Navbar user={user} onLogout={handleLogout} onNavigate={handleNavigate} />
+      <div>{renderPage()}</div>
     </>
   );
 }
 
-// ===== AUTH REQUIRED HELPER =====
-function AuthRequired({ onNavigate }) {
-  return (
-    <div className="container" style={{ paddingTop: '2rem' }}>
-      <div className="alert info">
-        Please login to access this feature.{' '}
-        <button
-          onClick={() => onNavigate('login')}
-          style={{
-            background: 'none',
-            textDecoration: 'underline',
-            cursor: 'pointer',
-            marginLeft: '0.5rem',
-            color: 'inherit',
-            border: 'none',
-            padding: 0,
-          }}>
-          Click here to login
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// Render the app
+// Mount the React app into the #root div
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
