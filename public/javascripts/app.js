@@ -12,21 +12,27 @@ const { useState, useEffect } = React;
 // Conditionally renders links based on auth state
 // ============================================================
 function Navbar({ user, onLogout, onNavigate }) {
+  const handleLogout = () => {
+    if (window.confirm('Are you sure you want to logout?')) {
+      onLogout();
+    }
+  };
+
   return (
     <nav>
       <div className="nav-content">
         <h1 onClick={() => onNavigate('home')} style={{ cursor: 'pointer' }}>
-          🎓 CampusFind
+          CampusFind
         </h1>
         <ul className="nav-links">
           {/* Show different nav links based on whether user is logged in */}
           {user ? (
             <>
-              <button onClick={() => onNavigate('browse')}>🔍 Browse</button>
-              <button onClick={() => onNavigate('post')}>📝 Post Item</button>
-              <button onClick={() => onNavigate('myclaims')}>📋 My Claims</button>
-              <button onClick={onLogout}>🚪 Logout</button>
-              <span className="user-info">👤 {user.email}</span>
+              <button onClick={() => onNavigate('browse')}>Browse Items</button>
+              <button onClick={() => onNavigate('post')}>Post Item</button>
+              <button onClick={() => onNavigate('myclaims')}>My Claims</button>
+              <button onClick={handleLogout}>Logout</button>
+              <span className="user-info">{user.email}</span>
             </>
           ) : (
             <>
@@ -62,8 +68,21 @@ function Login({ onNavigate, onLoginSuccess }) {
   // Form submit handler — async API call with error handling
   const handleSubmit = async (e) => {
     e.preventDefault();   // prevent page reload
-    setLoading(true);
     setError('');
+
+    // Validate password match
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    // Validate password length
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const response = await apiService.login(formData);
@@ -200,6 +219,7 @@ function Register({ onNavigate, onLoginSuccess }) {
               value={formData.password}
               onChange={handleChange}
               required
+              minLength="6"
               placeholder="Create a password (min 6 characters)"
             />
           </div>
@@ -262,7 +282,7 @@ function Home({ onNavigate, user }) {
       {/* Hero Section */}
       <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
         <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem', color: '#2c3e50' }}>
-          🎓 Welcome to CampusFind
+          Welcome to CampusFind
         </h1>
         <p style={{ fontSize: '1.1rem', color: '#7f8c8d', marginBottom: '2rem' }}>
           Lost something on campus? Help someone find theirs!
@@ -272,16 +292,16 @@ function Home({ onNavigate, user }) {
         {user ? (
           <div>
             <button onClick={() => onNavigate('browse')} style={{ marginRight: '1rem' }}>
-              🔍 Browse Items
+              Browse Items
             </button>
             <button onClick={() => onNavigate('post')} className="success">
-              📝 Post an Item
+              Post an Item
             </button>
           </div>
         ) : (
           <div>
             <button onClick={() => onNavigate('browse')} style={{ marginRight: '1rem' }}>
-              🔍 Browse Items
+              Browse Items
             </button>
             <button onClick={() => onNavigate('login')} style={{ marginRight: '1rem' }}>
               Login
@@ -312,15 +332,15 @@ function Home({ onNavigate, user }) {
       {/* Feature Highlights */}
       <div className="grid">
         <div className="card">
-          <h3>🔍 Search Items</h3>
+          <h3>Search Items</h3>
           <p>Browse all lost and found items. Filter by category, status, or search by keyword.</p>
         </div>
         <div className="card">
-          <h3>📝 Post Items</h3>
+          <h3>Post Items</h3>
           <p>Report a lost item or post something you found to reunite it with its owner.</p>
         </div>
         <div className="card">
-          <h3>✅ Claim Verification</h3>
+          <h3>Claim Verification</h3>
           <p>Submit a claim with proof of ownership. Staff verify and approve claims securely.</p>
         </div>
       </div>
@@ -388,7 +408,7 @@ function BrowseItems({ onNavigate, user }) {
 
   return (
     <div className="container">
-      <h2>🔍 Browse Items</h2>
+      <h2>Browse Items</h2>
 
       {/* Search and Filter Panel */}
       <div className="filters">
@@ -464,19 +484,26 @@ function BrowseItems({ onNavigate, user }) {
           {items.map(item => (
             <div key={item.id} className="card">
               {item.image_url && (
-                <img src={item.image_url} alt={item.title} className="card-image" />
+                <img
+                  src={item.image_url}
+                  alt={item.title}
+                  className="card-image"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                  }}
+                />
               )}
               <div className="card-header">
                 <h3 className="card-title">{item.title}</h3>
                 <span className={`badge ${item.status}`}>
-                  {item.status === 'lost' ? '❌ Lost' : item.status === 'found' ? '✅ Found' : '📦 Claimed'}
+                  {item.status === 'lost' ? 'Lost' : item.status === 'found' ? 'Found' : 'Claimed'}
                 </span>
               </div>
               <p className="card-description">{item.description}</p>
               <div className="card-meta">
-                <span>📁 {item.category}</span>
-                <span>📍 {item.location_found}</span>
-                <span>📅 {new Date(item.created_at).toLocaleDateString()}</span>
+                <span>Category: {item.category}</span>
+                <span>Location: {item.location_found}</span>
+                <span>Posted: {new Date(item.created_at).toLocaleDateString()}</span>
               </div>
               <div className="card-actions">
                 <button onClick={() => onNavigate('itemdetail', item.id)}>
@@ -549,24 +576,27 @@ function ItemDetail({ itemId, onNavigate, user }) {
             src={item.image_url}
             alt={item.title}
             style={{ width: '100%', maxHeight: '300px', objectFit: 'cover', borderRadius: '8px', marginBottom: '1rem' }}
+            onError={(e) => {
+              e.target.style.display = 'none';
+            }}
           />
         )}
         <div className="card-header">
           <h2 className="card-title">{item.title}</h2>
           <span className={`badge ${item.status}`}>
-            {item.status === 'lost' ? '❌ Lost' : item.status === 'found' ? '✅ Found' : '📦 Claimed'}
+            {item.status === 'lost' ? 'Lost' : item.status === 'found' ? 'Found' : 'Claimed'}
           </span>
         </div>
 
         <p style={{ marginBottom: '1.5rem', color: '#555' }}>{item.description}</p>
 
         <div className="card-meta" style={{ marginBottom: '1.5rem' }}>
-          <span>📁 <strong>Category:</strong> {item.category}</span>
-          <span>📍 <strong>Location:</strong> {item.location_found}</span>
-          <span>🏫 <strong>Campus:</strong> {item.campus}</span>
-          <span>📅 <strong>Posted:</strong> {new Date(item.created_at).toLocaleDateString()}</span>
+          <span>📁<strong>Category:</strong> {item.category}</span>
+          <span>📍<strong>Location:</strong> {item.location_found}</span>
+          <span>🏫<strong>Campus:</strong> {item.campus}</span>
+          <span>📅<strong>Posted:</strong> {new Date(item.created_at).toLocaleDateString()}</span>
           {item.first_name && (
-            <span>👤 <strong>By:</strong> {item.first_name} {item.last_name}</span>
+            <span>👤<strong>By:</strong> {item.first_name} {item.last_name}</span>
           )}
         </div>
 
@@ -575,7 +605,7 @@ function ItemDetail({ itemId, onNavigate, user }) {
         {/* Claim button — only shown when appropriate */}
         {user && item.status !== 'claimed' && item.user_id !== user.id && (
           <button onClick={() => setShowClaimForm(true)} className="success">
-            📋 Claim This Item
+            Claim This Item
           </button>
         )}
         {!user && (
@@ -652,7 +682,7 @@ function PostItem({ onNavigate }) {
   return (
     <div className="container">
       <div className="form-container">
-        <h2>📝 Post an Item</h2>
+        <h2>Post an Item</h2>
         <p style={{ color: '#7f8c8d', marginBottom: '1.5rem' }}>
           Report something you lost or found on campus.
         </p>
@@ -729,7 +759,7 @@ function PostItem({ onNavigate }) {
           </div>
 
           <button type="submit" disabled={loading} style={{ width: '100%' }}>
-            {loading ? 'Posting...' : '📤 Post Item'}
+            {loading ? 'Posting...' : 'Post Item'}
           </button>
         </form>
       </div>
@@ -772,7 +802,7 @@ function ClaimItem({ itemId, onClose, onClaimSuccess }) {
       zIndex: 1000,
     }}>
       <div className="form-container" style={{ maxWidth: '500px', width: '90%', margin: 0 }}>
-        <h2>📋 Submit a Claim</h2>
+        <h2>Submit a Claim</h2>
         <p style={{ color: '#7f8c8d', marginBottom: '1rem' }}>
           Describe why you believe this item is yours. Include serial numbers, initials, or other identifying details.
         </p>
@@ -841,7 +871,7 @@ function MyClaims({ onNavigate }) {
 
   return (
     <div className="container">
-      <h2>📋 My Claims</h2>
+      <h2>My Claims</h2>
       <p style={{ color: '#7f8c8d', marginBottom: '1.5rem' }}>
         Track the status of items you have claimed.
       </p>
@@ -862,7 +892,14 @@ function MyClaims({ onNavigate }) {
           {claims.map(claim => (
             <div key={claim.id} className="card">
               {claim.item_image && (
-                <img src={claim.item_image} alt={claim.item_title} className="card-image" />
+                <img
+                  src={claim.item_image}
+                  alt={claim.item_title || 'Item'}
+                  className="card-image"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                  }}
+                />
               )}
               <div className="card-header">
                 <h3 className="card-title">{claim.item_title || 'Item'}</h3>
@@ -872,14 +909,14 @@ function MyClaims({ onNavigate }) {
               </div>
               {claim.verification_notes && (
                 <p style={{ marginBottom: '0.5rem' }}>
-                  <strong>Your notes:</strong> {claim.verification_notes}
+             <strong>Your notes:</strong> {claim.verification_notes}
                 </p>
               )}
               <div className="card-meta">
-                <span>📅 Submitted: {new Date(claim.created_at).toLocaleDateString()}</span>
+                <span>Submitted: {new Date(claim.created_at).toLocaleDateString()}</span>
               </div>
             </div>
-          ))}
+          ))}}
         </div>
       )}
     </div>
@@ -982,3 +1019,4 @@ function App() {
 
 // Mount the React app into the #root div
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+

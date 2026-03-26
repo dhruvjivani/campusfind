@@ -45,14 +45,23 @@ class APIService {
       }
 
       const response = await fetch(`${this.baseURL}${endpoint}`, options);
-      const result = await response.json();
+      
+      let result;
+      try {
+        result = await response.json();
+      } catch (e) {
+        throw new Error('Invalid response from server');
+      }
 
       if (!response.ok) {
-        throw new Error(result.message || 'API Error');
+        throw new Error(result.message || `API Error: ${response.status}`);
       }
 
       return result;
     } catch (error) {
+      if (error instanceof TypeError) {
+        throw new Error('Network error: Unable to reach server');
+      }
       throw error;
     }
   }
@@ -75,7 +84,8 @@ class APIService {
     let query = '';
     if (filters.status) query += `?status=${filters.status}`;
     if (filters.category) query += `${query ? '&' : '?'}category=${filters.category}`;
-    if (filters.campus) query += `${query ? '&' : '?'}campus=${filters.campus}`;
+    if (filters.campus) query += `${query ? ? '&' : '?'}campus=${filters.campus}`;
+    if (filters.search) query += `${query ? '&' : '?'}search=${encodeURIComponent(filters.search)}`;
     return this.request('GET', `/items${query}`);
   }
 

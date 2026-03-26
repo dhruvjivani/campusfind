@@ -67,8 +67,5 @@ app.use((err, req, res, next) => {
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📁 Production URL: https://campusfind-0463.onrender.com`);
-  console.log(`🔗 API endpoint: https://campusfind-0463.onrender.com/api/items`);
-  console.log(`📚 Swagger Docs: https://campusfind-0463.onrender.com/api-docs`);
+  console.log(`Server running on port ${PORT}`);
 });

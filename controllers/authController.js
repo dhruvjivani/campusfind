@@ -13,13 +13,30 @@ const generateToken = (id) => {
 // @access  Public
 const register = async (req, res) => {
   try {
-    const { student_id, email, first_name, last_name, campus, program, password } = req.body;
+    const { email, password, full_name } = req.body;
+
+    // Validate required fields
+    if (!email || !password || !full_name) {
+      return res.status(400).json({ message: 'Email, password, and full name are required' });
+    }
 
     // Check if user exists
     const userExists = await User.findByEmail(email);
     if (userExists) {
       return res.status(400).json({ message: 'User already exists' });
     }
+
+    // Auto-generate student_id from email or random ID
+    const student_id = `S${Date.now()}`;
+    
+    // Split full_name into first and last name
+    const nameParts = full_name.trim().split(/\s+/);
+    const first_name = nameParts[0];
+    const last_name = nameParts.length > 1 ? nameParts.slice(1).join(' ') : 'User';
+    
+    // Set default campus if not provided
+    const campus = req.body.campus || 'Main Campus';
+    const program = req.body.program || 'Not Specified';
 
     // Create user
     const user = await User.create({

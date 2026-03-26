@@ -6,18 +6,18 @@ const USE_LOCALHOST = process.argv.includes('--local');
 const ACTUAL_API_BASE = USE_LOCALHOST ? 'http://localhost:5000' : API_BASE;
 
 async function testAPI() {
-  console.log(`🚀 Testing CampusFind API - Full CRUD Operations...`);
-  console.log(`📡 API Base: ${ACTUAL_API_BASE}\n`);
+  console.log(`Testing CampusFind API - Full CRUD Operations...`);
+  console.log(`API Base: ${ACTUAL_API_BASE}\n`);
   
   let token, token2, itemId, itemId2, itemId3, claimId, claimId2;
   
   try {
     // ============ AUTHENTICATION TESTS ============
-    console.log('📝 === AUTHENTICATION ===\n');
+    console.log('=== AUTHENTICATION ===\n');
     
     console.log('1. Testing health check...');
     const health = await axios.get(`${ACTUAL_API_BASE}/`);
-    console.log('✅ Health check passed:', health.data.message);
+    console.log('Health check passed:', health.data.message);
     
     console.log('\n2. Registering first user...');
     const timestamp = Date.now();
@@ -32,7 +32,7 @@ async function testAPI() {
     };
     
     const register = await axios.post(`${ACTUAL_API_BASE}/api/auth/register`, registerData);
-    console.log('✅ User registered:', register.data.user.email);
+    console.log('User registered:', register.data.user.email);
     token = register.data.token;
     
     console.log('\n3. Registering second user...');
@@ -47,7 +47,7 @@ async function testAPI() {
     };
     
     const register2 = await axios.post(`${ACTUAL_API_BASE}/api/auth/register`, registerData2);
-    console.log('✅ Second user registered:', register2.data.user.email);
+    console.log('Second user registered:', register2.data.user.email);
     token2 = register2.data.token;
     
     console.log('\n4. Testing login...');
@@ -55,10 +55,10 @@ async function testAPI() {
       email: registerData.email,
       password: 'Test123'
     });
-    console.log('✅ Login successful');
+    console.log('Login successful');
     
     // ============ ITEMS CRUD TESTS ============
-    console.log('\n\n📦 === ITEMS CRUD OPERATIONS ===\n');
+    console.log('\n\n=== ITEMS CRUD OPERATIONS ===\n');
     
     console.log('5. CREATE - Reporting found item...');
     const formData = new FormData();
@@ -75,7 +75,7 @@ async function testAPI() {
       }
     });
     itemId = item.data.item.id;
-    console.log('✅ Item created:', item.data.item.title, '(ID:', itemId, ')');
+    console.log('Item created:', item.data.item.title, '(ID:', itemId, ')');
     
     console.log('\n6. CREATE - Reporting lost item...');
     const formData2 = new FormData();
@@ -92,16 +92,16 @@ async function testAPI() {
       }
     });
     itemId2 = lostItem.data.item.id;
-    console.log('✅ Lost item created:', lostItem.data.item.title, '(Status: lost)');
+    console.log('Lost item created:', lostItem.data.item.title, '(Status: lost)');
     
     console.log('\n7. READ - Getting single item...');
     const getItem = await axios.get(`${ACTUAL_API_BASE}/api/items/${itemId}`);
-    console.log('✅ Retrieved item:', getItem.data.title, 'by', getItem.data.first_name);
+    console.log('Retrieved item:', getItem.data.title, 'by', getItem.data.first_name);
     
     console.log('\n8. READ - Getting all items with filters...');
     const items = await axios.get(`${ACTUAL_API_BASE}/api/items?category=electronics&limit=10&page=1`);
-    console.log(`✅ Retrieved ${items.data.count} items (Total: ${items.data.total})`);
-    
+    console.log(`Retrieved ${items.data.count} items (Total: ${items.data.total})`);
+
     console.log('\n9. UPDATE - Updating item details...');
     const updateItem = await axios.put(`${ACTUAL_API_BASE}/api/items/${itemId}`, {
       title: 'iPhone 14 Pro - Space Black',
@@ -109,10 +109,8 @@ async function testAPI() {
     }, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    console.log('✅ Item updated:', updateItem.data.item.title);
-    
-    // ============ CLAIMS CRUD TESTS ============
-    console.log('\n\n🎯 === CLAIMS CRUD OPERATIONS ===\n');
+    console.log('Item updated:', updateItem.data.item.title);
+    console.log('\n\n=== CLAIMS CRUD OPERATIONS ===\n');
     
     console.log('10. CREATE - Submitting claim for item...');
     const claim = await axios.post(`${ACTUAL_API_BASE}/api/claims`, {
@@ -121,7 +119,7 @@ async function testAPI() {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     claimId = claim.data.claim.id;
-    console.log('✅ Claim submitted (ID:', claimId, ') with status:', claim.data.claim.status);
+    console.log('Claim submitted (ID:', claimId, ') with status:', claim.data.claim.status);
     
     console.log('\n11. CREATE - Creating another item for second claim...');
     const formData3 = new FormData();
@@ -138,7 +136,7 @@ async function testAPI() {
       }
     });
     itemId3 = item3.data.item.id;
-    console.log('✅ Second item created for claim test (ID:', itemId3, ')');
+    console.log('Second item created for claim test (ID:', itemId3, ')');
     
     console.log('\n12. CREATE - Submitting second claim...');
     const claim2 = await axios.post(`${ACTUAL_API_BASE}/api/claims`, {
@@ -147,25 +145,25 @@ async function testAPI() {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     claimId2 = claim2.data.claim.id;
-    console.log('✅ Second claim submitted (ID:', claimId2, ')');
+    console.log('Second claim submitted (ID:', claimId2, ')');
     
     console.log('\n13. READ - Getting single claim...');
     const getClaim = await axios.get(`${ACTUAL_API_BASE}/api/claims/${claimId}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    console.log('✅ Retrieved claim for item:', getClaim.data.item_title);
+    console.log('Retrieved claim for item:', getClaim.data.item_title);
     
     console.log('\n14. READ - Getting user claims...');
     const userClaims = await axios.get(`${ACTUAL_API_BASE}/api/claims/user/my-claims`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    console.log(`✅ Retrieved ${userClaims.data.count} user claims`);
+    console.log(`Retrieved ${userClaims.data.count} user claims`);
     
     console.log('\n15. READ - Getting claims for specific item...');
     const itemClaims = await axios.get(`${ACTUAL_API_BASE}/api/items/${itemId3}/claims`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    console.log(`✅ Retrieved ${itemClaims.data.count} claims for this item`);
+    console.log(`Retrieved ${itemClaims.data.count} claims for this item`);
     
     console.log('\n16. UPDATE - Updating claim...');
     const updateClaim = await axios.put(`${ACTUAL_API_BASE}/api/claims/${claimId2}`, {
@@ -173,37 +171,37 @@ async function testAPI() {
     }, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    console.log('✅ Claim updated with status:', updateClaim.data.claim.status);
+    console.log('Claim updated with status:', updateClaim.data.claim.status);
     
     console.log('\n17. DELETE - Deleting pending claim...');
     const deleteClaim = await axios.delete(`${ACTUAL_API_BASE}/api/claims/${claimId2}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    console.log('✅ Claim deleted successfully');
+    console.log('Claim deleted successfully');
     
     // Verify item status reverted
     const itemAfterDelete = await axios.get(`${ACTUAL_API_BASE}/api/items/${itemId3}`);
     console.log('   Item status reverted to:', itemAfterDelete.data.status);
     
     // ============ TEST SUMMARY ============
-    console.log('\n\n📊 === TEST SUMMARY ===');
-    console.log('✅ All CRUD Operations Completed Successfully!\n');
+    console.log('\n\n=== TEST SUMMARY ===');
+    console.log('All CRUD Operations Completed Successfully!\n');
     console.log('Tested Operations:');
     console.log('  Authentication:');
-    console.log('    ✓ User registration');
-    console.log('    ✓ User login');
+    console.log('    - User registration');
+    console.log('    - User login');
     console.log('  Items:');
-    console.log('    ✓ CREATE - Report found/lost items');
-    console.log('    ✓ READ - Get single item, Get all items with filters');
-    console.log('    ✓ UPDATE - Update item details');
+    console.log('    - CREATE - Report found/lost items');
+    console.log('    - READ - Get single item, Get all items with filters');
+    console.log('    - UPDATE - Update item details');
     console.log('  Claims:');
-    console.log('    ✓ CREATE - Submit claims');
-    console.log('    ✓ READ - Get claim, user claims, item claims');
-    console.log('    ✓ UPDATE - Update claim status');
-    console.log('    ✓ DELETE - Delete pending claim');
+    console.log('    - CREATE - Submit claims');
+    console.log('    - READ - Get claim, user claims, item claims');
+    console.log('    - UPDATE - Update claim status');
+    console.log('    - DELETE - Delete pending claim');
     
   } catch (error) {
-    console.error('❌ Test failed:');
+    console.error('Test failed:');
     console.error('Status:', error.response?.status);
     console.error('Message:', error.response?.data?.message || error.message);
     console.error('Details:', error.response?.data);
