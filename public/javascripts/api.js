@@ -84,7 +84,7 @@ class APIService {
     let query = '';
     if (filters.status) query += `?status=${filters.status}`;
     if (filters.category) query += `${query ? '&' : '?'}category=${filters.category}`;
-    if (filters.campus) query += `${query ? ? '&' : '?'}campus=${filters.campus}`;
+    if (filters.campus) query += `${query ? '&' : '?'}campus=${filters.campus}`;
     if (filters.search) query += `${query ? '&' : '?'}search=${encodeURIComponent(filters.search)}`;
     return this.request('GET', `/items${query}`);
   }
