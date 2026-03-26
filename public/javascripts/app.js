@@ -69,20 +69,14 @@ function Login({ onNavigate, onLoginSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();   // prevent page reload
     setError('');
-
-    // Validate password match
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
-    // Validate password length
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long');
-      return;
-    }
-
     setLoading(true);
+
+    // Validate email and password
+    if (!formData.email || !formData.password) {
+      setError('Email and password are required');
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await apiService.login(formData);
@@ -160,9 +154,21 @@ function Register({ onNavigate, onLoginSuccess }) {
     e.preventDefault();
     setError('');
 
-    // Client-side validation before hitting the API
+    // Validate required fields
+    if (!formData.email || !formData.password || !formData.fullName) {
+      setError('All fields are required');
+      return;
+    }
+
+    // Validate password match
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
+      return;
+    }
+
+    // Validate password length
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters long');
       return;
     }
 

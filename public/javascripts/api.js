@@ -135,3 +135,6 @@ class APIService {
 }
 
 const apiService = new APIService();
+
+// Make apiService globally accessible
+window.apiService = apiService;
