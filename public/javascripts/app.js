@@ -1,16 +1,5 @@
-// ============================================================
-// CampusFind - React SPA
-// Sprint 2: React Basics, State Management, Forms
-// ============================================================
-
-// Destructure React hooks at the top (React 18 via CDN)
 const { useState, useEffect } = React;
 
-// ============================================================
-// NAVBAR COMPONENT
-// Props: user (object|null), onLogout (fn), onNavigate (fn)
-// Conditionally renders links based on auth state
-// ============================================================
 function Navbar({ user, onLogout, onNavigate }) {
   const handleLogout = () => {
     if (window.confirm('Are you sure you want to logout?')) {
@@ -47,11 +36,9 @@ function Navbar({ user, onLogout, onNavigate }) {
   );
 }
 
-// ============================================================
 // LOGIN COMPONENT
 // Controlled form using useState
 // Calls apiService.login() on submit, stores JWT token
-// ============================================================
 function Login({ onNavigate, onLoginSuccess }) {
   // State for form fields
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -131,10 +118,8 @@ function Login({ onNavigate, onLoginSuccess }) {
   );
 }
 
-// ============================================================
 // REGISTER COMPONENT
 // Controlled form with client-side password match validation
-// ============================================================
 function Register({ onNavigate, onLoginSuccess }) {
   const [formData, setFormData] = useState({
     email: '',
@@ -253,11 +238,9 @@ function Register({ onNavigate, onLoginSuccess }) {
   );
 }
 
-// ============================================================
 // HOME COMPONENT
 // Landing page — shows live item stats and quick-action buttons
 // Uses useEffect to fetch stats on mount
-// ============================================================
 function Home({ onNavigate, user }) {
   // State to hold item counts fetched from the API
   const [stats, setStats] = useState({ total: 0, lost: 0, found: 0 });
@@ -354,11 +337,9 @@ function Home({ onNavigate, user }) {
   );
 }
 
-// ============================================================
 // BROWSE ITEMS COMPONENT
 // Fetches items from API with filters + keyword search
 // useEffect re-runs whenever filters change (reactive)
-// ============================================================
 function BrowseItems({ onNavigate, user }) {
   const [items, setItems] = useState([]);       // array of item objects
   const [loading, setLoading] = useState(true);
@@ -524,10 +505,8 @@ function BrowseItems({ onNavigate, user }) {
   );
 }
 
-// ============================================================
 // ITEM DETAIL COMPONENT
 // Fetches a single item by ID — shows full details + claim button
-// ============================================================
 function ItemDetail({ itemId, onNavigate, user }) {
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -597,12 +576,12 @@ function ItemDetail({ itemId, onNavigate, user }) {
         <p style={{ marginBottom: '1.5rem', color: '#555' }}>{item.description}</p>
 
         <div className="card-meta" style={{ marginBottom: '1.5rem' }}>
-          <span>📁<strong>Category:</strong> {item.category}</span>
-          <span>📍<strong>Location:</strong> {item.location_found}</span>
-          <span>🏫<strong>Campus:</strong> {item.campus}</span>
-          <span>📅<strong>Posted:</strong> {new Date(item.created_at).toLocaleDateString()}</span>
+          <span><strong>Category:</strong> {item.category}</span>
+          <span><strong>Location:</strong> {item.location_found}</span>
+          <span><strong>Campus:</strong> {item.campus}</span>
+          <span><strong>Posted:</strong> {new Date(item.created_at).toLocaleDateString()}</span>
           {item.first_name && (
-            <span>👤<strong>By:</strong> {item.first_name} {item.last_name}</span>
+            <span><strong>By:</strong> {item.first_name} {item.last_name}</span>
           )}
         </div>
 
@@ -643,11 +622,9 @@ function ItemDetail({ itemId, onNavigate, user }) {
   );
 }
 
-// ============================================================
 // POST ITEM COMPONENT
 // Controlled form — posts to /api/items/found or /api/items/lost
 // based on the status dropdown selection
-// ============================================================
 function PostItem({ onNavigate }) {
   const [formData, setFormData] = useState({
     title: '',
@@ -773,10 +750,8 @@ function PostItem({ onNavigate }) {
   );
 }
 
-// ============================================================
 // CLAIM ITEM MODAL COMPONENT
 // Overlay modal — submits a claim for a specific item
-// ============================================================
 function ClaimItem({ itemId, onClose, onClaimSuccess }) {
   const [notes, setNotes] = useState('');
   const [error, setError] = useState('');
@@ -841,10 +816,8 @@ function ClaimItem({ itemId, onClose, onClaimSuccess }) {
   );
 }
 
-// ============================================================
 // MY CLAIMS COMPONENT
 // Fetches the logged-in user's submitted claims from the API
-// ============================================================
 function MyClaims({ onNavigate }) {
   const [claims, setClaims] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -922,16 +895,14 @@ function MyClaims({ onNavigate }) {
                 <span>Submitted: {new Date(claim.created_at).toLocaleDateString()}</span>
               </div>
             </div>
-          ))}}
+          ))}
         </div>
       )}
     </div>
   );
 }
 
-// ============================================================
 // AUTH REQUIRED — shown when a page needs login
-// ============================================================
 function AuthRequired({ onNavigate }) {
   return (
     <div className="container" style={{ paddingTop: '2rem' }}>
@@ -947,11 +918,6 @@ function AuthRequired({ onNavigate }) {
   );
 }
 
-// ============================================================
-// APP (ROOT COMPONENT)
-// Manages global state: current page, logged-in user
-// Acts as the router — renders the right component based on currentPage
-// ============================================================
 function App() {
   const [currentPage, setCurrentPage] = useState('home');  // active "route"
   const [user, setUser] = useState(null);                   // logged-in user or null
