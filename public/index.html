@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CampusFind - Lost & Found System</title>
+  <title>CampusFind – Lost & Found System</title>
   <link rel="stylesheet" href="/stylesheets/style.css">
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -11,13 +11,18 @@
 </head>
 <body>
   <div id="root"></div>
+
   <!-- API Service -->
   <script src="/javascripts/api.js"></script>
-  
+
   <!-- Auth Components -->
   <script type="text/babel" src="/javascripts/components/auth/Login.jsx"></script>
   <script type="text/babel" src="/javascripts/components/auth/Register.jsx"></script>
-  
+
+  <!-- Shared Components -->
+  <script type="text/babel" src="/javascripts/components/shared/Navbar.jsx"></script>
+  <script type="text/babel" src="/javascripts/components/shared/ClaimItem.jsx"></script>
+
   <!-- Page Components -->
   <script type="text/babel" src="/javascripts/pages/Home.jsx"></script>
   <script type="text/babel" src="/javascripts/pages/BrowseItems.jsx"></script>
@@ -25,11 +30,8 @@
   <script type="text/babel" src="/javascripts/pages/PostItem.jsx"></script>
   <script type="text/babel" src="/javascripts/pages/MyClaims.jsx"></script>
   <script type="text/babel" src="/javascripts/pages/AuthRequired.jsx"></script>
-  
-  <!-- Shared Components -->
-  <script type="text/babel" src="/javascripts/components/shared/Navbar.jsx"></script>
-  <script type="text/babel" src="/javascripts/components/shared/ClaimItem.jsx"></script>
-  
+  <script type="text/babel" src="/javascripts/pages/StaffDashboard.jsx"></script>
+
   <!-- Main App -->
   <script type="text/babel" src="/javascripts/components/App.jsx"></script>
 </body>

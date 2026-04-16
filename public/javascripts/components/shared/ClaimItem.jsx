@@ -7,9 +7,12 @@ function ClaimItem({ itemId, onClose, onClaimSuccess }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!notes.trim()) {
+      setError('Please describe why you believe this item is yours.');
+      return;
+    }
     setError('');
     setLoading(true);
-
     try {
       const response = await apiService.createClaim({
         item_id: itemId,
@@ -24,37 +27,33 @@ function ClaimItem({ itemId, onClose, onClaimSuccess }) {
   };
 
   return (
-    <div style={{
-      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      display: 'flex', justifyContent: 'center', alignItems: 'center',
-      zIndex: 1000,
-    }}>
-      <div className="form-container" style={{ maxWidth: '500px', width: '90%', margin: 0 }}>
-        <h2>Submit a Claim</h2>
-        <p style={{ color: '#7f8c8d', marginBottom: '1rem' }}>
-          Describe why you believe this item is yours. Include serial numbers, initials, or other identifying details.
+    <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="modal-box">
+        <h2>✋ Submit a Claim</h2>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: 20 }}>
+          Describe why you believe this item belongs to you. Include serial numbers,
+          unique markings, initials, or any other proof of ownership.
         </p>
 
-        {error && <div className="alert error">{error}</div>}
+        {error && <div className="alert error">⚠️ {error}</div>}
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Proof of Ownership *</label>
+            <label>Proof of Ownership <span className="required-star">*</span></label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               required
               rows="5"
-              placeholder="e.g., Serial number: ABC123, initials 'DJ' on the inside tag, bought it from Staples last September..."
-            ></textarea>
+              placeholder="e.g., Serial number: ABC123, 'DJ' initials on the inside tag, bought from Staples in September, has a crack on the top-left corner..."
+            />
           </div>
 
-          <div style={{ display: 'flex', gap: '1rem' }}>
-            <button type="submit" disabled={loading} style={{ flex: 1 }}>
-              {loading ? 'Submitting...' : 'Submit Claim'}
+          <div className="modal-actions">
+            <button type="submit" disabled={loading} className="success">
+              {loading ? '⏳ Submitting...' : '✅ Submit Claim'}
             </button>
-            <button type="button" onClick={onClose} className="secondary" style={{ flex: 1 }}>
+            <button type="button" className="btn-secondary" onClick={onClose}>
               Cancel
             </button>
           </div>

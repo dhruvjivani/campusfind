@@ -4,6 +4,7 @@ function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [user, setUser] = useState(null);
   const [selectedItemId, setSelectedItemId] = useState(null);
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -23,6 +24,7 @@ function App() {
   const handleNavigate = (page, itemId = null) => {
     setCurrentPage(page);
     if (itemId) setSelectedItemId(itemId);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleLoginSuccess = (userData) => {
@@ -49,9 +51,13 @@ function App() {
       case 'itemdetail':
         return <ItemDetail itemId={selectedItemId} onNavigate={handleNavigate} user={user} />;
       case 'post':
-        return user ? <PostItem onNavigate={handleNavigate} /> : <AuthRequired onNavigate={handleNavigate} />;
+        return user ? <PostItem onNavigate={handleNavigate} user={user} /> : <AuthRequired onNavigate={handleNavigate} />;
       case 'myclaims':
-        return user ? <MyClaims onNavigate={handleNavigate} /> : <AuthRequired onNavigate={handleNavigate} />;
+        return user ? <MyClaims onNavigate={handleNavigate} user={user} /> : <AuthRequired onNavigate={handleNavigate} />;
+      case 'staffdashboard':
+        return user && user.role === 'staff'
+          ? <StaffDashboard onNavigate={handleNavigate} user={user} />
+          : <AuthRequired onNavigate={handleNavigate} message="Staff access required." />;
       default:
         return <Home onNavigate={handleNavigate} user={user} />;
     }

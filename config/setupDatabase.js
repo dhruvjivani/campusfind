@@ -113,7 +113,7 @@ async function setupDatabase() {
         ($37, $38, $39, $40, $41, $42, $43, $44, $45),
         ($46, $47, $48, $49, $50, $51, $52, $53, $54)
       `, [
-        'S001', 'djivani@conestogac.on.ca', 'Dhruv', 'Jivani', 'Main', 'Mobile and Web Development', '$2y$10$RTtomPipixuar/97Q/eGiuPao4T/usKJj6dkbplmc7jjUAkK2EE82', true, 'staff',
+        'S001', 'djivani@conestogac.on.ca', 'Dhruv', 'Jivani', 'Main', 'Mobile and Web Development', '$2a$10$W9BynesHQpKh75H5mREMp.DpQVHlLBzyaHo3fIndBTIba2s4SR9Lq', true, 'staff',
         'S002', 'student@conestogac.on.ca', 'Jeel', 'Patel', 'Main', 'Web Development', '$2y$10$RTtomPipixuar/97Q/eGiuPao4T/usKJj6dkbplmc7jjUAkK2EE82', true, 'student',
         'S003', 'maya@conestogac.on.ca', 'Maya', 'Singh', 'Waterloo', 'Business Management', '$2y$10$RTtomPipixuar/97Q/eGiuPao4T/usKJj6dkbplmc7jjUAkK2EE82', true, 'student',
         'S004', 'alex@conestogac.on.ca', 'Alex', 'Johnson', 'Main', 'Computer Science', '$2y$10$RTtomPipixuar/97Q/eGiuPao4T/usKJj6dkbplmc7jjUAkK2EE82', true, 'student',

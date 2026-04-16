@@ -129,6 +129,22 @@ class APIService {
     return this.request('PUT', `/claims/${id}`, claimData);
   }
 
+  async verifyClaim(id, data) {
+    return this.request('PUT', `/claims/${id}/verify`, data);
+  }
+
+  async deleteClaim(id) {
+    return this.request('DELETE', `/claims/${id}`);
+  }
+
+  async updateItemStatus(id, data) {
+    return this.request('PUT', `/items/${id}/status`, data);
+  }
+
+  async getItemClaims(id) {
+    return this.request('GET', `/items/${id}/claims`);
+  }
+
   async getMyProfile() {
     return this.request('GET', '/auth/me');
   }

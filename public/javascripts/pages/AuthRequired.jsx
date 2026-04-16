@@ -1,13 +1,18 @@
-function AuthRequired({ onNavigate }) {
+function AuthRequired({ onNavigate, message }) {
   return (
-    <div className="container" style={{ paddingTop: '2rem' }}>
-      <div className="alert info">
-        You must be logged in to access this page.{' '}
-        <button
-          onClick={() => onNavigate('login')}
-          style={{ background: 'none', textDecoration: 'underline', cursor: 'pointer', color: 'inherit', border: 'none', padding: 0 }}>
-          Click here to login
-        </button>
+    <div className="container">
+      <div className="auth-required">
+        <span className="auth-required-icon">🔐</span>
+        <h3>Login Required</h3>
+        <p>{message || 'You need to be logged in to access this page.'}</p>
+        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <button onClick={() => onNavigate('login')}>
+            Sign In
+          </button>
+          <button className="btn-secondary" onClick={() => onNavigate('register')}>
+            Create Account
+          </button>
+        </div>
       </div>
     </div>
   );

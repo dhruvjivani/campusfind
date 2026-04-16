@@ -2,6 +2,7 @@ const { useState, useEffect } = React;
 
 function Home({ onNavigate, user }) {
   const [stats, setStats] = useState({ total: 0, lost: 0, found: 0 });
+
   useEffect(() => {
     const loadStats = async () => {
       try {
@@ -12,82 +13,118 @@ function Home({ onNavigate, user }) {
         ]);
         setStats({
           total: allRes.total || 0,
-          lost: lostRes.total || 0,
+          lost:  lostRes.total || 0,
           found: foundRes.total || 0,
         });
-      } catch (err) {
-      }
+      } catch {}
     };
     loadStats();
   }, []);
 
+  const isStaff = user && user.role === 'staff';
+
   return (
     <div className="container">
-      {/* Hero Section */}
-      <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-        <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem', color: '#2c3e50' }}>
-          Welcome to CampusFind
+
+      {/* Hero */}
+      <div className="hero">
+        <span className="hero-icon">🔍</span>
+        <h1>
+          Lost something on <span>campus</span>?<br />
+          We'll help you find it.
         </h1>
-        <p style={{ fontSize: '1.1rem', color: '#7f8c8d', marginBottom: '2rem' }}>
-          Lost something on campus? Help someone find theirs!
+        <p>
+          CampusFind connects students and staff to reunite lost items with their owners —
+          fast, secure, and completely free.
         </p>
 
-        {/* Action buttons — differ based on auth state */}
-        {user ? (
-          <div>
-            <button onClick={() => onNavigate('browse')} style={{ marginRight: '1rem' }}>
-              Browse Items
-            </button>
-            <button onClick={() => onNavigate('post')} className="success">
-              Post an Item
-            </button>
-          </div>
-        ) : (
-          <div>
-            <button onClick={() => onNavigate('browse')} style={{ marginRight: '1rem' }}>
-              Browse Items
-            </button>
-            <button onClick={() => onNavigate('login')} style={{ marginRight: '1rem' }}>
-              Login
-            </button>
-            <button onClick={() => onNavigate('register')} className="success">
-              Register
-            </button>
-          </div>
+        <div className="hero-actions">
+          <button className="hero-btn-primary" onClick={() => onNavigate('browse')}>
+            🔎 Browse Items
+          </button>
+          {user ? (
+            <>
+              <button className="hero-btn-secondary" onClick={() => onNavigate('post')}>
+                + Post an Item
+              </button>
+              {isStaff && (
+                <button className="hero-btn-secondary" onClick={() => onNavigate('staffdashboard')}>
+                  🏛 Staff Panel
+                </button>
+              )}
+            </>
+          ) : (
+            <>
+              <button className="hero-btn-secondary" onClick={() => onNavigate('register')}>
+                🎓 Create Account
+              </button>
+            </>
+          )}
+        </div>
+
+        {user && (
+          <p style={{ marginTop: 24, fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)' }}>
+            Welcome back, <strong style={{ color: '#93c5fd' }}>{user.first_name || user.email}</strong>
+            {isStaff && <span className="badge staff" style={{ marginLeft: 8 }}>🏛 Staff</span>}
+          </p>
         )}
       </div>
 
       {/* Live Stats */}
-      <div className="grid" style={{ marginBottom: '2rem' }}>
-        <div className="card" style={{ textAlign: 'center' }}>
-          <h2 style={{ fontSize: '2.5rem', color: '#3498db' }}>{stats.total}</h2>
-          <p style={{ color: '#7f8c8d' }}>Total Items Listed</p>
+      <div className="grid-3" style={{ marginBottom: 32 }}>
+        <div className="stat-card blue">
+          <div className="stat-number">{stats.total}</div>
+          <div className="stat-label">📦 Total Items Listed</div>
         </div>
-        <div className="card" style={{ textAlign: 'center' }}>
-          <h2 style={{ fontSize: '2.5rem', color: '#e74c3c' }}>{stats.lost}</h2>
-          <p style={{ color: '#7f8c8d' }}>Items Reported Lost</p>
+        <div className="stat-card red">
+          <div className="stat-number">{stats.lost}</div>
+          <div className="stat-label">🔴 Items Reported Lost</div>
         </div>
-        <div className="card" style={{ textAlign: 'center' }}>
-          <h2 style={{ fontSize: '2.5rem', color: '#27ae60' }}>{stats.found}</h2>
-          <p style={{ color: '#7f8c8d' }}>Items Found & Listed</p>
+        <div className="stat-card green">
+          <div className="stat-number">{stats.found}</div>
+          <div className="stat-label">🟢 Items Found &amp; Listed</div>
         </div>
       </div>
 
-      {/* Feature Highlights */}
-      <div className="grid">
-        <div className="card">
-          <h3>Search Items</h3>
-          <p>Browse all lost and found items. Filter by category, status, or search by keyword.</p>
+      {/* How it works */}
+      <h2 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: 16, color: 'var(--text)' }}>
+        How it works
+      </h2>
+      <div className="features-grid">
+        <div className="feature-card">
+          <div className="feature-icon blue">🔎</div>
+          <h3>Browse &amp; Search</h3>
+          <p>Filter items by category, status, or keyword. Find your lost item or see what's been turned in.</p>
         </div>
-        <div className="card">
+        <div className="feature-card">
+          <div className="feature-icon green">📦</div>
           <h3>Post Items</h3>
-          <p>Report a lost item or post something you found to reunite it with its owner.</p>
+          <p>Report something you lost or found on campus. Add photos, location, and a description.</p>
         </div>
-        <div className="card">
-          <h3>Claim Verification</h3>
-          <p>Submit a claim with proof of ownership. Staff verify and approve claims securely.</p>
+        <div className="feature-card">
+          <div className="feature-icon purple">✅</div>
+          <h3>Claim &amp; Verify</h3>
+          <p>Submit a claim with proof of ownership. Staff review and approve claims securely.</p>
         </div>
       </div>
+
+      {/* CTA for guests */}
+      {!user && (
+        <div className="card" style={{ textAlign: 'center', padding: '40px 24px', background: 'linear-gradient(135deg, var(--primary-light), var(--staff-light))' }}>
+          <h3 style={{ fontSize: '1.3rem', marginBottom: 10 }}>Ready to get started?</h3>
+          <p style={{ color: 'var(--text-muted)', marginBottom: 20 }}>
+            Create a free account to post items, submit claims, and track your requests.
+          </p>
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button onClick={() => onNavigate('register')} className="success">
+              🎓 Register as Student
+            </button>
+            <button onClick={() => onNavigate('login')} className="btn-secondary">
+              Already have an account? Sign In
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

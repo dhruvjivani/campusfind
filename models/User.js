@@ -11,7 +11,6 @@ class User {
 
     // Verify .on.ca email
     const isVerified = email.endsWith('.on.ca');
-
     const result = await pool.query(
       `INSERT INTO users 
        (student_id, email, first_name, last_name, campus, program, password, is_verified) 
