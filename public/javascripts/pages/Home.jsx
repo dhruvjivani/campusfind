@@ -1,8 +1,27 @@
-const { useState, useEffect } = React;
+/**
+ * Home.jsx — Landing / Dashboard page  (route: /)
+ *
+ * Shows:
+ *  • Hero banner with CTA buttons (context-aware: guest vs. student vs. staff)
+ *  • Live stats fetched from the API (total / lost / found counts)
+ *  • "How it works" feature cards
+ *  • Guest CTA section
+ */
 
-function Home({ onNavigate, user }) {
+const { useState, useEffect } = React;
+const { useHistory, Link }    = ReactRouterDOM;
+
+/**
+ * Home component
+ * @param {{ user: object|null }} props
+ */
+function Home({ user }) {
+  const history = useHistory();
+
+  /** @type {[{ total: number, lost: number, found: number }, Function]} */
   const [stats, setStats] = useState({ total: 0, lost: 0, found: 0 });
 
+  /* Fetch live stats on mount */
   useEffect(() => {
     const loadStats = async () => {
       try {
@@ -12,11 +31,13 @@ function Home({ onNavigate, user }) {
           apiService.getItems({ status: 'found' }),
         ]);
         setStats({
-          total: allRes.total || 0,
+          total: allRes.total  || 0,
           lost:  lostRes.total || 0,
           found: foundRes.total || 0,
         });
-      } catch {}
+      } catch {
+        // Stats are non-critical; silently ignore errors
+      }
     };
     loadStats();
   }, []);
@@ -26,7 +47,7 @@ function Home({ onNavigate, user }) {
   return (
     <div className="container">
 
-      {/* Hero */}
+      {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <div className="hero">
         <span className="hero-icon">🔍</span>
         <h1>
@@ -38,39 +59,41 @@ function Home({ onNavigate, user }) {
           fast, secure, and completely free.
         </p>
 
+        {/* CTA buttons differ by auth/role state */}
         <div className="hero-actions">
-          <button className="hero-btn-primary" onClick={() => onNavigate('browse')}>
+          <button className="hero-btn-primary" onClick={() => history.push('/browse')}>
             🔎 Browse Items
           </button>
+
           {user ? (
             <>
-              <button className="hero-btn-secondary" onClick={() => onNavigate('post')}>
+              <button className="hero-btn-secondary" onClick={() => history.push('/post')}>
                 + Post an Item
               </button>
               {isStaff && (
-                <button className="hero-btn-secondary" onClick={() => onNavigate('staffdashboard')}>
+                <button className="hero-btn-secondary" onClick={() => history.push('/staff')}>
                   🏛 Staff Panel
                 </button>
               )}
             </>
           ) : (
-            <>
-              <button className="hero-btn-secondary" onClick={() => onNavigate('register')}>
-                🎓 Create Account
-              </button>
-            </>
+            <button className="hero-btn-secondary" onClick={() => history.push('/register')}>
+              🎓 Create Account
+            </button>
           )}
         </div>
 
+        {/* Personalised welcome for logged-in users */}
         {user && (
           <p style={{ marginTop: 24, fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)' }}>
-            Welcome back, <strong style={{ color: '#93c5fd' }}>{user.first_name || user.email}</strong>
+            Welcome back,{' '}
+            <strong style={{ color: '#93c5fd' }}>{user.first_name || user.email}</strong>
             {isStaff && <span className="badge staff" style={{ marginLeft: 8 }}>🏛 Staff</span>}
           </p>
         )}
       </div>
 
-      {/* Live Stats */}
+      {/* ── Live Stats ───────────────────────────────────────────────────── */}
       <div className="grid-3" style={{ marginBottom: 32 }}>
         <div className="stat-card blue">
           <div className="stat-number">{stats.total}</div>
@@ -86,20 +109,20 @@ function Home({ onNavigate, user }) {
         </div>
       </div>
 
-      {/* How it works */}
-      <h2 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: 16, color: 'var(--text)' }}>
+      {/* ── How it works ─────────────────────────────────────────────────── */}
+      <h2 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: 16 }}>
         How it works
       </h2>
-      <div className="features-grid">
+      <div className="features-grid" style={{ marginBottom: 32 }}>
         <div className="feature-card">
           <div className="feature-icon blue">🔎</div>
           <h3>Browse &amp; Search</h3>
-          <p>Filter items by category, status, or keyword. Find your lost item or see what's been turned in.</p>
+          <p>Filter items by category, status, campus, or keyword. Find your missing item fast.</p>
         </div>
         <div className="feature-card">
           <div className="feature-icon green">📦</div>
           <h3>Post Items</h3>
-          <p>Report something you lost or found on campus. Add photos, location, and a description.</p>
+          <p>Report something you lost or found. Add photos, location, and a detailed description.</p>
         </div>
         <div className="feature-card">
           <div className="feature-icon purple">✅</div>
@@ -108,23 +131,27 @@ function Home({ onNavigate, user }) {
         </div>
       </div>
 
-      {/* CTA for guests */}
+      {/* ── Guest call-to-action ─────────────────────────────────────────── */}
       {!user && (
-        <div className="card" style={{ textAlign: 'center', padding: '40px 24px', background: 'linear-gradient(135deg, var(--primary-light), var(--staff-light))' }}>
+        <div className="card" style={{
+          textAlign: 'center', padding: '40px 24px',
+          background: 'linear-gradient(135deg, var(--primary-light), var(--staff-light))',
+        }}>
           <h3 style={{ fontSize: '1.3rem', marginBottom: 10 }}>Ready to get started?</h3>
           <p style={{ color: 'var(--text-muted)', marginBottom: 20 }}>
             Create a free account to post items, submit claims, and track your requests.
           </p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button onClick={() => onNavigate('register')} className="success">
+            <button className="success" onClick={() => history.push('/register')}>
               🎓 Register as Student
             </button>
-            <button onClick={() => onNavigate('login')} className="btn-secondary">
+            <button className="btn-secondary" onClick={() => history.push('/login')}>
               Already have an account? Sign In
             </button>
           </div>
         </div>
       )}
+
     </div>
   );
 }

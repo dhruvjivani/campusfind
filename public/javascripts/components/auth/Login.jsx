@@ -1,30 +1,62 @@
+/**
+ * Login.jsx — Authentication: Sign In
+ *
+ * Features:
+ *  • Student / Staff tab switcher (same API endpoint; visual UX cue)
+ *  • Show / hide password toggle
+ *  • Redirects back to the page the user originally tried to visit
+ *    (via React Router location.state.from)
+ *
+ * Props:
+ *   onLoginSuccess {Function} — called with the user object after login
+ */
+
 const { useState } = React;
+const { useHistory, useLocation } = ReactRouterDOM;
 
-function Login({ onNavigate, onLoginSuccess }) {
-  const [role, setRole] = useState('student');
-  const [formData, setFormData] = useState({ email: '', password: '' });
+/**
+ * Login component
+ * @param {{ onLoginSuccess: Function }} props
+ */
+function Login({ onLoginSuccess }) {
+  const history  = useHistory();
+  const location = useLocation();
+
+  /* After login, send the user where they originally wanted to go */
+  const { from } = location.state || { from: { pathname: '/' } };
+
+  /* ── State ───────────────────────────────────────────────────────────────── */
+  const [role,         setRole]         = useState('student'); // 'student' | 'staff'
+  const [formData,     setFormData]     = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [error,        setError]        = useState('');
+  const [loading,      setLoading]      = useState(false);
 
+  /* Generic change handler */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  /**
+   * Submits credentials to POST /api/auth/login
+   * Stores the returned JWT and calls onLoginSuccess.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
     if (!formData.email || !formData.password) {
       setError('Email and password are required.');
       return;
     }
+
     setLoading(true);
     try {
       const response = await apiService.login(formData);
       apiService.setToken(response.token);
       onLoginSuccess(response.user);
-      onNavigate('home');
+      history.replace(from); // go back to the intended page
     } catch (err) {
       setError(err.message || 'Invalid credentials. Please try again.');
     } finally {
@@ -34,90 +66,81 @@ function Login({ onNavigate, onLoginSuccess }) {
 
   const isStaff = role === 'staff';
 
+  /* ── Render ──────────────────────────────────────────────────────────────── */
   return (
     <div className="auth-page">
       <div className="auth-split">
-        {/* Left branding panel */}
+
+        {/* ── Left branding panel ──────────────────────────────────────────── */}
         <div className="auth-brand-panel">
           <div className="auth-brand-logo">🔍</div>
           <h2>CampusFind Lost &amp; Found</h2>
-          <p>Helping the campus community reunite people with their lost belongings since day one.</p>
+          <p>Helping the campus community reunite people with their lost belongings.</p>
           <div className="auth-features">
             <div className="auth-feature-item">
-              <span>📦</span>
-              <span>Post lost or found items instantly</span>
+              <span>📦</span><span>Post lost or found items instantly</span>
             </div>
             <div className="auth-feature-item">
-              <span>🔎</span>
-              <span>Search &amp; filter by category or location</span>
+              <span>🔎</span><span>Search &amp; filter by category or location</span>
             </div>
             <div className="auth-feature-item">
-              <span>✅</span>
-              <span>Secure claim verification by staff</span>
+              <span>✅</span><span>Secure claim verification by staff</span>
             </div>
             <div className="auth-feature-item">
-              <span>🏫</span>
-              <span>Covers all campus locations</span>
+              <span>🏫</span><span>All campus locations supported</span>
             </div>
           </div>
         </div>
 
-        {/* Right form panel */}
+        {/* ── Right form panel ─────────────────────────────────────────────── */}
         <div className="auth-form-panel">
           <div className="auth-form-header">
             <h2>Welcome back</h2>
             <p>Sign in to your CampusFind account</p>
           </div>
 
-          {/* Student / Staff tab switch */}
+          {/* Student / Staff tab selector */}
           <div className="auth-role-tabs">
             <button
               type="button"
               className={`auth-role-tab student-tab${role === 'student' ? ' active' : ''}`}
               onClick={() => { setRole('student'); setError(''); }}
-            >
-              🎓 Student
-            </button>
+            >🎓 Student</button>
             <button
               type="button"
               className={`auth-role-tab staff-tab${role === 'staff' ? ' active' : ''}`}
               onClick={() => { setRole('staff'); setError(''); }}
-            >
-              🏛 Staff
-            </button>
+            >🏛 Staff</button>
           </div>
 
+          {/* Staff note */}
           {isStaff && (
             <div className="staff-note">
               <span>ℹ️</span>
-              <span>Staff members use their assigned college email to log in. Contact IT if you need access.</span>
+              <span>Staff use their assigned college email. Contact IT for access issues.</span>
             </div>
           )}
 
-          {error && (
-            <div className="alert error">
-              <span>⚠️</span> {error}
-            </div>
-          )}
+          {/* Error alert */}
+          {error && <div className="alert error"><span>⚠️</span> {error}</div>}
 
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} noValidate>
+
+            {/* Email */}
             <div className="form-group">
               <label>Email address</label>
               <div className="input-wrapper">
                 <span className="input-icon">✉️</span>
                 <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  className="has-icon"
+                  type="email" name="email"
+                  value={formData.email} onChange={handleChange}
+                  required autoComplete="email" className="has-icon"
                   placeholder={isStaff ? 'staff.name@college.on.ca' : 'student.name@college.on.ca'}
-                  autoComplete="email"
                 />
               </div>
             </div>
 
+            {/* Password with show/hide toggle */}
             <div className="form-group">
               <label>Password</label>
               <div className="input-wrapper">
@@ -125,30 +148,24 @@ function Login({ onNavigate, onLoginSuccess }) {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
+                  value={formData.password} onChange={handleChange}
+                  required autoComplete="current-password"
                   className="has-icon has-icon-right"
                   placeholder="Enter your password"
-                  autoComplete="current-password"
                 />
                 <button
-                  type="button"
-                  className="input-icon-right"
+                  type="button" className="input-icon-right"
                   onClick={() => setShowPassword(v => !v)}
                   title={showPassword ? 'Hide password' : 'Show password'}
-                >
-                  {showPassword ? '🙈' : '👁️'}
-                </button>
+                >{showPassword ? '🙈' : '👁️'}</button>
               </div>
             </div>
 
             <button
-              type="submit"
-              disabled={loading}
+              type="submit" disabled={loading}
               className={`btn-submit${isStaff ? ' staff-submit' : ''}`}
             >
-              {loading ? '⏳ Signing in...' : (isStaff ? '🏛 Staff Sign In' : '🎓 Student Sign In')}
+              {loading ? '⏳ Signing in…' : isStaff ? '🏛 Staff Sign In' : '🎓 Student Sign In'}
             </button>
           </form>
 
@@ -156,11 +173,12 @@ function Login({ onNavigate, onLoginSuccess }) {
 
           <div className="auth-link-row">
             Don't have an account?{' '}
-            <button className="auth-link-btn" onClick={() => onNavigate('register')}>
+            <button className="auth-link-btn" onClick={() => history.push('/register')}>
               Create one here
             </button>
           </div>
         </div>
+
       </div>
     </div>
   );
