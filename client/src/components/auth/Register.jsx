@@ -1,27 +1,14 @@
-/**
- * Register.jsx — Authentication: Create Account
- *
- * Features:
- *  • Campus and Program fields sent to the backend
- *  • Live password-strength indicator (4-bar visual)
- *  • Real-time confirm-password match feedback
- *  • Auto-verification notice for .on.ca college emails
- *
- * Props:
- *   onLoginSuccess {Function} — called with the user object after registration
- */
-
-const { useState } = React;
-const { useHistory } = ReactRouterDOM;
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import apiService from '../../services/api';
 
 /**
- * Register component
- * @param {{ onLoginSuccess: Function }} props
+ * Register — Create Account page
+ * Props: onLoginSuccess(userData)
  */
 function Register({ onLoginSuccess }) {
-  const history = useHistory();
+  const navigate = useNavigate();
 
-  /* ── State ───────────────────────────────────────────────────────────────── */
   const [formData, setFormData] = useState({
     fullName: '', email: '', password: '',
     confirmPassword: '', campus: 'Main Campus', program: '',
@@ -31,24 +18,18 @@ function Register({ onLoginSuccess }) {
   const [error,        setError]        = useState('');
   const [loading,      setLoading]      = useState(false);
 
-  /* Generic change handler */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  /**
-   * Calculates password strength on a 1-4 scale.
-   * @param {string} pw
-   * @returns {{ score: number, label: string, cls: string, bars: boolean[] }}
-   */
   const getPasswordStrength = (pw) => {
     if (!pw) return { score: 0, label: '', cls: '', bars: [false, false, false, false] };
     let score = 0;
-    if (pw.length >= 6)                              score++; // minimum length
-    if (pw.length >= 10)                             score++; // good length
-    if (/[A-Z]/.test(pw) && /[0-9]/.test(pw))       score++; // mixed case + digit
-    if (/[^A-Za-z0-9]/.test(pw))                    score++; // special character
+    if (pw.length >= 6)                        score++;
+    if (pw.length >= 10)                       score++;
+    if (/[A-Z]/.test(pw) && /[0-9]/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw))              score++;
     const labels  = ['', 'Weak', 'Fair', 'Good', 'Strong'];
     const classes = ['', 'weak', 'fair', 'good', 'strong'];
     return { score, label: labels[score], cls: classes[score],
@@ -57,14 +38,10 @@ function Register({ onLoginSuccess }) {
 
   const strength = getPasswordStrength(formData.password);
 
-  /**
-   * Submits new account data to POST /api/auth/register
-   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    /* Client-side validation */
     if (!formData.fullName || !formData.email || !formData.password) {
       setError('Full name, email, and password are required.');
       return;
@@ -89,7 +66,7 @@ function Register({ onLoginSuccess }) {
       });
       apiService.setToken(response.token);
       onLoginSuccess(response.user);
-      history.replace('/');
+      navigate('/', { replace: true });
     } catch (err) {
       setError(err.message || 'Registration failed. That email may already be in use.');
     } finally {
@@ -97,12 +74,11 @@ function Register({ onLoginSuccess }) {
     }
   };
 
-  /* ── Render ──────────────────────────────────────────────────────────────── */
   return (
     <div className="auth-page">
       <div className="auth-split">
 
-        {/* ── Left branding panel ──────────────────────────────────────────── */}
+        {/* Left branding panel */}
         <div className="auth-brand-panel">
           <div className="auth-brand-logo">🎓</div>
           <h2>Join CampusFind Today</h2>
@@ -115,7 +91,7 @@ function Register({ onLoginSuccess }) {
           </div>
         </div>
 
-        {/* ── Right form panel ─────────────────────────────────────────────── */}
+        {/* Right form panel */}
         <div className="auth-form-panel">
           <div className="auth-form-header">
             <h2>Create your account</h2>
@@ -125,8 +101,6 @@ function Register({ onLoginSuccess }) {
           {error && <div className="alert error"><span>⚠️</span> {error}</div>}
 
           <form onSubmit={handleSubmit} noValidate>
-
-            {/* Full name */}
             <div className="form-group">
               <label>Full Name <span className="required-star">*</span></label>
               <div className="input-wrapper">
@@ -140,7 +114,6 @@ function Register({ onLoginSuccess }) {
               </div>
             </div>
 
-            {/* Email */}
             <div className="form-group">
               <label>College Email <span className="required-star">*</span></label>
               <div className="input-wrapper">
@@ -152,7 +125,6 @@ function Register({ onLoginSuccess }) {
                   placeholder="jane.smith@college.on.ca"
                 />
               </div>
-              {/* Live .on.ca verification hint */}
               {formData.email.endsWith('.on.ca') && (
                 <p style={{ fontSize: '0.78rem', color: 'var(--success)', marginTop: 4 }}>
                   ✅ College email — account will be auto-verified
@@ -160,7 +132,6 @@ function Register({ onLoginSuccess }) {
               )}
             </div>
 
-            {/* Campus + Program row */}
             <div className="form-row">
               <div className="form-group">
                 <label>Campus</label>
@@ -180,7 +151,6 @@ function Register({ onLoginSuccess }) {
               </div>
             </div>
 
-            {/* Password */}
             <div className="form-group">
               <label>Password <span className="required-star">*</span></label>
               <div className="input-wrapper">
@@ -198,7 +168,6 @@ function Register({ onLoginSuccess }) {
                   {showPassword ? '🙈' : '👁️'}
                 </button>
               </div>
-              {/* Strength meter */}
               {formData.password && (
                 <div className="password-strength">
                   {strength.bars.map((filled, i) => (
@@ -209,7 +178,6 @@ function Register({ onLoginSuccess }) {
               )}
             </div>
 
-            {/* Confirm password */}
             <div className="form-group">
               <label>Confirm Password <span className="required-star">*</span></label>
               <div className="input-wrapper">
@@ -227,7 +195,6 @@ function Register({ onLoginSuccess }) {
                   {showConfirm ? '🙈' : '👁️'}
                 </button>
               </div>
-              {/* Live match indicator */}
               {formData.confirmPassword && formData.password !== formData.confirmPassword && (
                 <p style={{ fontSize: '0.78rem', color: 'var(--danger)', marginTop: 4 }}>❌ Passwords do not match</p>
               )}
@@ -245,7 +212,7 @@ function Register({ onLoginSuccess }) {
 
           <div className="auth-link-row">
             Already have an account?{' '}
-            <button className="auth-link-btn" onClick={() => history.push('/login')}>
+            <button className="auth-link-btn" onClick={() => navigate('/login')}>
               Sign in here
             </button>
           </div>
@@ -259,3 +226,5 @@ function Register({ onLoginSuccess }) {
     </div>
   );
 }
+
+export default Register;

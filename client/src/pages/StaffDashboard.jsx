@@ -1,50 +1,31 @@
-/**
- * StaffDashboard.jsx — Staff Control Panel  (route: /staff)
- *
- * Staff-only route — enforced by StaffRoute in App.jsx.
- *
- * Features:
- *  • Live stats cards (total / lost / found / claimed)
- *  • Three tabs: Overview | Manage Items | Verify Claims
- *  • Item management: change status via dropdown, delete items
- *  • Claims management: expand per-item claims, verify / reject / complete
- *  • Auto-refreshes local state after every action (no manual page reload needed)
- */
-
-const { useState, useEffect } = React;
-const { useHistory, Link }    = ReactRouterDOM;
+import { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import apiService from '../services/api';
 
 /**
- * StaffDashboard component
- * @param {{ user: object }} props - Authenticated staff user
+ * StaffDashboard — Staff Control Panel (route: /staff)
+ * Staff-only route — enforced by RequireStaff in App.jsx.
+ * Props: user (object)
  */
 function StaffDashboard({ user }) {
-  const history = useHistory();
+  const navigate = useNavigate();
 
-  /* ── Tab state ───────────────────────────────────────────────────────────── */
-  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'items' | 'claims'
+  const [activeTab,    setActiveTab]    = useState('overview');
+  const [items,        setItems]        = useState([]);
+  const [stats,        setStats]        = useState({ total:0, lost:0, found:0, claimed:0 });
+  const [loading,      setLoading]      = useState(true);
+  const [error,        setError]        = useState('');
+  const [successMsg,   setSuccessMsg]   = useState('');
 
-  /* ── Data state ──────────────────────────────────────────────────────────── */
-  const [items,  setItems]  = useState([]);
-  const [stats,  setStats]  = useState({ total:0, lost:0, found:0, claimed:0 });
-  const [loading, setLoading] = useState(true);
-  const [error,   setError]  = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
-
-  /* Per-item claims panel */
   const [expandedItemId, setExpandedItemId] = useState(null);
-  const [itemClaims,     setItemClaims]     = useState({});   // { [itemId]: Claim[] }
-  const [claimsLoading,  setClaimsLoading]  = useState({});   // { [itemId]: boolean }
-
-  /* Action loading states */
-  const [statusChanging, setStatusChanging] = useState({}); // { [itemId]: boolean }
+  const [itemClaims,     setItemClaims]     = useState({});
+  const [claimsLoading,  setClaimsLoading]  = useState({});
+  const [statusChanging, setStatusChanging] = useState({});
   const [deletingItem,   setDeletingItem]   = useState(null);
-  const [verifyingClaim, setVerifyingClaim] = useState({}); // { [claimId]: boolean }
+  const [verifyingClaim, setVerifyingClaim] = useState({});
 
-  /* Fetch all items + stats on mount */
   useEffect(() => { loadAll(); }, []);
 
-  /** Loads all items and computes stats from four parallel API calls */
   const loadAll = async () => {
     setLoading(true);
     setError('');
@@ -56,9 +37,9 @@ function StaffDashboard({ user }) {
         apiService.getItems({ status: 'claimed' }),
       ]);
       setStats({
-        total:   allRes.total    || 0,
-        lost:    lostRes.total   || 0,
-        found:   foundRes.total  || 0,
+        total:   allRes.total     || 0,
+        lost:    lostRes.total    || 0,
+        found:   foundRes.total   || 0,
         claimed: claimedRes.total || 0,
       });
       setItems(allRes.data || []);
@@ -69,18 +50,11 @@ function StaffDashboard({ user }) {
     }
   };
 
-  /** Displays a temporary success message for 3 seconds */
   const showSuccess = (msg) => {
     setSuccessMsg(msg);
     setTimeout(() => setSuccessMsg(''), 3000);
   };
 
-  /* ── Item actions ────────────────────────────────────────────────────────── */
-
-  /**
-   * Changes an item's status via PUT /api/items/:id/status
-   * Updates local state immediately to avoid re-fetching the whole list.
-   */
   const handleStatusChange = async (itemId, newStatus) => {
     setStatusChanging(prev => ({ ...prev, [itemId]: true }));
     try {
@@ -94,10 +68,6 @@ function StaffDashboard({ user }) {
     }
   };
 
-  /**
-   * Deletes an item via DELETE /api/items/:id
-   * Removes it from local state on success.
-   */
   const handleDeleteItem = async (itemId) => {
     if (!window.confirm('Permanently delete this item? This cannot be undone.')) return;
     setDeletingItem(itemId);
@@ -112,12 +82,6 @@ function StaffDashboard({ user }) {
     }
   };
 
-  /* ── Claims panel ────────────────────────────────────────────────────────── */
-
-  /**
-   * Toggles the claims panel for an item.
-   * Lazy-loads claims on first open via GET /api/items/:id/claims
-   */
   const toggleClaims = async (itemId) => {
     if (expandedItemId === itemId) { setExpandedItemId(null); return; }
     setExpandedItemId(itemId);
@@ -134,24 +98,14 @@ function StaffDashboard({ user }) {
     }
   };
 
-  /**
-   * Verifies, rejects, or completes a claim via PUT /api/claims/:id/verify
-   * @param {number} claimId
-   * @param {number} itemId    - Parent item (used to update local claim list)
-   * @param {string} status    - 'verified' | 'rejected' | 'completed'
-   */
   const handleVerifyClaim = async (claimId, itemId, status) => {
     setVerifyingClaim(prev => ({ ...prev, [claimId]: true }));
     try {
       await apiService.verifyClaim(claimId, { status });
-      /* Update the claim's status in local state */
       setItemClaims(prev => ({
         ...prev,
-        [itemId]: (prev[itemId] || []).map(c =>
-          c.id === claimId ? { ...c, status } : c
-        ),
+        [itemId]: (prev[itemId] || []).map(c => c.id === claimId ? { ...c, status } : c),
       }));
-      /* If verified/completed, mark the item as claimed in the items list */
       if (status === 'verified' || status === 'completed') {
         setItems(prev => prev.map(i => i.id === itemId ? { ...i, status: 'claimed' } : i));
       }
@@ -163,14 +117,12 @@ function StaffDashboard({ user }) {
     }
   };
 
-  /** Renders a coloured badge for any status string */
   const statusBadge = (s) => <span className={`badge ${s}`}>{s}</span>;
 
-  /* ── Render ──────────────────────────────────────────────────────────────── */
   return (
     <div className="container">
 
-      {/* ── Staff header banner ──────────────────────────────────────────── */}
+      {/* Staff header banner */}
       <div className="staff-header">
         <div className="staff-header-icon">🏛</div>
         <div>
@@ -179,7 +131,6 @@ function StaffDashboard({ user }) {
         </div>
       </div>
 
-      {/* Feedback alerts */}
       {successMsg && <div className="alert success">✅ {successMsg}</div>}
       {error && (
         <div className="alert error">
@@ -189,7 +140,7 @@ function StaffDashboard({ user }) {
         </div>
       )}
 
-      {/* ── Stats row ────────────────────────────────────────────────────── */}
+      {/* Stats row */}
       <div className="grid-4" style={{ marginBottom: 28 }}>
         <div className="stat-card blue">
           <div className="stat-number">{stats.total}</div>
@@ -209,7 +160,7 @@ function StaffDashboard({ user }) {
         </div>
       </div>
 
-      {/* ── Tab bar ──────────────────────────────────────────────────────── */}
+      {/* Tab bar */}
       <div className="tabs">
         {['overview', 'items', 'claims'].map(tab => (
           <button key={tab}
@@ -223,24 +174,20 @@ function StaffDashboard({ user }) {
         ))}
       </div>
 
-      {/* ════════════════════════════════════════════════════════════════════
-          TAB: Overview
-      ════════════════════════════════════════════════════════════════════ */}
+      {/* Tab: Overview */}
       {activeTab === 'overview' && (
         <div>
-          {/* Quick action buttons */}
           <div className="card" style={{ marginBottom: 20 }}>
             <h3 style={{ marginBottom: 16 }}>Quick Actions</h3>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               <button onClick={() => setActiveTab('items')}>📦 Manage Items</button>
               <button className="btn-staff" onClick={() => setActiveTab('claims')}>📋 Review Claims</button>
-              <button className="btn-secondary" onClick={() => history.push('/browse')}>
+              <button className="btn-secondary" onClick={() => navigate('/browse')}>
                 🔎 Public Browse View
               </button>
             </div>
           </div>
 
-          {/* Recent items preview */}
           <div className="card">
             <h3 style={{ marginBottom: 16 }}>Recent Items</h3>
             {loading ? (
@@ -252,9 +199,9 @@ function StaffDashboard({ user }) {
                     <h4>{item.title}</h4>
                     <p>📍 {item.location_found} · {item.campus} · {new Date(item.created_at).toLocaleDateString()}</p>
                   </div>
-                  <div style={{ display:'flex', gap:8, alignItems:'center', flexShrink:0 }}>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
                     {statusBadge(item.status)}
-                    <Link to={`/items/${item.id}`} style={{ textDecoration:'none' }}>
+                    <Link to={`/items/${item.id}`} style={{ textDecoration: 'none' }}>
                       <button className="btn-sm">View</button>
                     </Link>
                   </div>
@@ -262,7 +209,7 @@ function StaffDashboard({ user }) {
               ))
             )}
             {items.length > 5 && (
-              <button className="btn-secondary" style={{ marginTop:12, width:'100%' }}
+              <button className="btn-secondary" style={{ marginTop: 12, width: '100%' }}
                 onClick={() => setActiveTab('items')}>
                 View All {items.length} Items →
               </button>
@@ -271,9 +218,7 @@ function StaffDashboard({ user }) {
         </div>
       )}
 
-      {/* ════════════════════════════════════════════════════════════════════
-          TAB: Manage Items (CRUD — Read / Update / Delete)
-      ════════════════════════════════════════════════════════════════════ */}
+      {/* Tab: Manage Items */}
       {activeTab === 'items' && (
         <div>
           <div className="page-header">
@@ -292,7 +237,6 @@ function StaffDashboard({ user }) {
           ) : (
             items.map(item => (
               <div key={item.id}>
-                {/* Item row */}
                 <div className="item-row">
                   <div className="item-row-info">
                     <h4>{item.title}</h4>
@@ -300,8 +244,6 @@ function StaffDashboard({ user }) {
                   </div>
                   <div className="item-row-actions">
                     {statusBadge(item.status)}
-
-                    {/* Status dropdown */}
                     <select className="status-select"
                       value={item.status}
                       disabled={statusChanging[item.id]}
@@ -311,18 +253,12 @@ function StaffDashboard({ user }) {
                       <option value="found">Found</option>
                       <option value="claimed">Claimed</option>
                     </select>
-
-                    {/* Toggle claims panel */}
                     <button className="btn-sm" onClick={() => toggleClaims(item.id)}>
                       {expandedItemId === item.id ? '▲ Hide Claims' : '📋 Claims'}
                     </button>
-
-                    {/* View on public page */}
-                    <Link to={`/items/${item.id}`} style={{ textDecoration:'none' }}>
+                    <Link to={`/items/${item.id}`} style={{ textDecoration: 'none' }}>
                       <button className="btn-sm btn-secondary">View</button>
                     </Link>
-
-                    {/* Delete */}
                     <button className="btn-sm danger"
                       disabled={deletingItem === item.id}
                       onClick={() => handleDeleteItem(item.id)}>
@@ -331,7 +267,6 @@ function StaffDashboard({ user }) {
                   </div>
                 </div>
 
-                {/* Expandable claims panel */}
                 {expandedItemId === item.id && (
                   <ClaimsPanelInline
                     itemId={item.id}
@@ -348,9 +283,7 @@ function StaffDashboard({ user }) {
         </div>
       )}
 
-      {/* ════════════════════════════════════════════════════════════════════
-          TAB: Verify Claims
-      ════════════════════════════════════════════════════════════════════ */}
+      {/* Tab: Verify Claims */}
       {activeTab === 'claims' && (
         <div>
           <div className="page-header">
@@ -361,16 +294,15 @@ function StaffDashboard({ user }) {
           {loading ? (
             <div className="loading"><div className="spinner"></div></div>
           ) : (
-            /* Show only found/claimed items since those are claimable */
             items.filter(i => i.status !== 'lost').map(item => (
               <div key={item.id} style={{ marginBottom: 8 }}>
-                <div className="item-row" style={{ cursor:'pointer' }}
+                <div className="item-row" style={{ cursor: 'pointer' }}
                   onClick={() => toggleClaims(item.id)}>
                   <div className="item-row-info">
                     <h4>{item.title}</h4>
                     <p>📍 {item.location_found} · {item.campus}</p>
                   </div>
-                  <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                     {statusBadge(item.status)}
                     <button className="btn-sm btn-staff">
                       {expandedItemId === item.id ? '▲ Hide' : '📋 Claims'}
@@ -406,19 +338,14 @@ function StaffDashboard({ user }) {
   );
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   ClaimsPanelInline — Reusable expandable claims list used in both tabs
-───────────────────────────────────────────────────────────────────────────── */
-/**
- * @param {{ itemId, claims, loading, verifyingClaim, onVerify, statusBadge }} props
- */
+// Reusable expandable claims list used in both tabs
 function ClaimsPanelInline({ itemId, claims, loading, verifyingClaim, onVerify, statusBadge }) {
   if (loading) {
     return (
       <div className="claims-panel">
-        <div style={{ textAlign:'center', padding:12 }}>
-          <div className="spinner" style={{ width:24, height:24, borderWidth:2, margin:'0 auto 8px' }}></div>
-          <p style={{ fontSize:'0.85rem', color:'var(--text-muted)' }}>Loading claims…</p>
+        <div style={{ textAlign: 'center', padding: 12 }}>
+          <div className="spinner" style={{ width: 24, height: 24, borderWidth: 2, margin: '0 auto 8px' }}></div>
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Loading claims…</p>
         </div>
       </div>
     );
@@ -427,7 +354,7 @@ function ClaimsPanelInline({ itemId, claims, loading, verifyingClaim, onVerify, 
   if (!claims || claims.length === 0) {
     return (
       <div className="claims-panel">
-        <p style={{ fontSize:'0.85rem', color:'var(--text-muted)', textAlign:'center', padding:'12px 0' }}>
+        <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textAlign: 'center', padding: '12px 0' }}>
           No claims submitted for this item yet.
         </p>
       </div>
@@ -441,19 +368,18 @@ function ClaimsPanelInline({ itemId, claims, loading, verifyingClaim, onVerify, 
           <div className="claim-info">
             <p><strong>Claimer:</strong> {claim.claimer_first_name || 'Unknown'} {claim.claimer_last_name || ''}</p>
             {claim.verification_notes && (
-              <p style={{ marginTop:4, background:'#f8fafc', padding:'6px 10px',
-                          borderRadius:4, fontSize:'0.85rem' }}>
+              <p style={{ marginTop: 4, background: '#f8fafc', padding: '6px 10px',
+                          borderRadius: 4, fontSize: '0.85rem' }}>
                 💬 "{claim.verification_notes}"
               </p>
             )}
-            <p style={{ color:'var(--text-muted)', fontSize:'0.8rem', marginTop:4 }}>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: 4 }}>
               {new Date(claim.created_at).toLocaleDateString()}
             </p>
           </div>
-          <div style={{ display:'flex', gap:8, alignItems:'center', flexShrink:0 }}>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
             {statusBadge(claim.status)}
 
-            {/* Action buttons shown only in actionable states */}
             {claim.status === 'pending' && (
               <div className="claim-actions">
                 <button className="btn-sm success"
@@ -481,3 +407,5 @@ function ClaimsPanelInline({ itemId, claims, loading, verifyingClaim, onVerify, 
     </div>
   );
 }
+
+export default StaffDashboard;

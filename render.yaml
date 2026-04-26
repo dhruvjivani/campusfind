@@ -7,7 +7,7 @@ services:
     env: node
     region: oregon
     plan: free
-    buildCommand: npm install
+    buildCommand: npm install && cd client && npm install && npm run build && cd ..
     startCommand: node server.js
     healthCheckPath: /
     envVars:

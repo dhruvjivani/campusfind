@@ -13,8 +13,14 @@ const claimRoutes = require('./routes/claimRoutes');
 // Initialize express
 const app = express();
 
-// Middleware
-app.use(cors());
+// Middleware — allow requests from the React dev server in development
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production'
+    ? process.env.FRONTEND_URL || true
+    : ['http://localhost:5173', 'http://localhost:3000'],
+  credentials: true,
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -34,21 +40,20 @@ app.get('/swagger.json', (req, res) => {
   res.send(swaggerSpec);
 });
 
-// Serve static files from public folder
-app.use(express.static(path.join(__dirname, 'public')));
-
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/items', itemRoutes);
 app.use('/api/claims', claimRoutes);
 
-// Serve React app for all other routes
-app.get('*', (req, res) => {
-  // Check if it's an API call by checking the path
-  if (!req.path.startsWith('/api')) {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-  }
-});
+// In production serve the compiled React frontend from client/dist
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, 'client', 'dist')));
+  app.get('*', (req, res) => {
+    if (!req.path.startsWith('/api')) {
+      res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+    }
+  });
+}
 
 // 404 handler
 app.use((req, res) => {

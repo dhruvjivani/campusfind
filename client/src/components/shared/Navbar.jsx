@@ -1,78 +1,63 @@
-/**
- * Navbar.jsx — Global navigation bar
- *
- * Uses React Router's <NavLink> for accessible, active-state-aware links so
- * no full page reloads occur when the user navigates between sections.
- *
- * Props:
- *   user     {object|null} — authenticated user or null
- *   onLogout {Function}    — clears auth state in App
- */
-
-const { NavLink, useHistory } = ReactRouterDOM;
+import { NavLink, useNavigate } from 'react-router-dom';
 
 /**
- * Navbar component
- * @param {{ user: object|null, onLogout: Function }} props
+ * Navbar — global navigation bar
+ * Props: user (object|null), onLogout (Function)
  */
 function Navbar({ user, onLogout }) {
-  const history = useHistory(); // programmatic navigation after logout
+  const navigate = useNavigate();
 
-  /** Confirm logout then redirect to home */
   const handleLogout = () => {
     if (window.confirm('Are you sure you want to log out?')) {
       onLogout();
-      history.push('/');
+      navigate('/');
     }
   };
 
-  /** Whether the current user has the staff role */
   const isStaff = user && user.role === 'staff';
 
-  /* Active-link style applied by NavLink when the route matches */
-  const activeStyle = { color: '#fff', background: 'rgba(255,255,255,0.12)' };
+  // NavLink receives isActive from react-router-dom v6
+  const navStyle = ({ isActive }) =>
+    isActive ? { color: '#fff', background: 'rgba(255,255,255,0.12)' } : undefined;
 
   return (
     <nav>
       <div className="nav-content">
 
-        {/* ── Brand / Logo ───────────────────────────────────────────────── */}
-        <NavLink to="/" exact style={{ textDecoration: 'none' }}>
+        {/* Brand / Logo */}
+        <NavLink to="/" end style={{ textDecoration: 'none' }}>
           <div className="nav-brand">
             <div className="nav-brand-icon">🔍</div>
             <h1>CampusFind</h1>
           </div>
         </NavLink>
 
-        {/* ── Navigation links ───────────────────────────────────────────── */}
+        {/* Navigation links */}
         <ul className="nav-links">
           {user ? (
-            /* ── Authenticated links ─────────────────────────────────────── */
             <>
               <li>
-                <NavLink to="/browse" activeStyle={activeStyle}>
+                <NavLink to="/browse" style={navStyle}>
                   <button className="nav-btn">Browse Items</button>
                 </NavLink>
               </li>
               <li>
-                <NavLink to="/post" activeStyle={activeStyle}>
+                <NavLink to="/post" style={navStyle}>
                   <button className="nav-btn">+ Post Item</button>
                 </NavLink>
               </li>
 
-              {/* Students see their own claims; staff manage via the panel */}
               {!isStaff && (
                 <li>
-                  <NavLink to="/my-claims" activeStyle={activeStyle}>
+                  <NavLink to="/my-claims" style={navStyle}>
                     <button className="nav-btn">My Claims</button>
                   </NavLink>
                 </li>
               )}
 
-              {/* Staff-only panel link */}
               {isStaff && (
                 <li>
-                  <NavLink to="/staff" activeStyle={activeStyle}>
+                  <NavLink to="/staff" style={navStyle}>
                     <button
                       className="nav-btn"
                       style={{ background: 'rgba(124,58,237,0.25)', color: '#c4b5fd' }}
@@ -83,7 +68,6 @@ function Navbar({ user, onLogout }) {
                 </li>
               )}
 
-              {/* User info chip */}
               <li>
                 <div className="nav-user-info">
                   <span>{user.first_name || user.email.split('@')[0]}</span>
@@ -93,7 +77,6 @@ function Navbar({ user, onLogout }) {
                 </div>
               </li>
 
-              {/* Logout */}
               <li>
                 <button className="nav-btn nav-logout" onClick={handleLogout}>
                   Logout
@@ -101,20 +84,19 @@ function Navbar({ user, onLogout }) {
               </li>
             </>
           ) : (
-            /* ── Guest links ─────────────────────────────────────────────── */
             <>
               <li>
-                <NavLink to="/browse" activeStyle={activeStyle}>
+                <NavLink to="/browse" style={navStyle}>
                   <button className="nav-btn">Browse</button>
                 </NavLink>
               </li>
               <li>
-                <NavLink to="/login" activeStyle={activeStyle}>
+                <NavLink to="/login" style={navStyle}>
                   <button className="nav-btn">Login</button>
                 </NavLink>
               </li>
               <li>
-                <NavLink to="/register" activeStyle={activeStyle}>
+                <NavLink to="/register" style={navStyle}>
                   <button className="nav-btn nav-cta">Register</button>
                 </NavLink>
               </li>
@@ -126,3 +108,5 @@ function Navbar({ user, onLogout }) {
     </nav>
   );
 }
+
+export default Navbar;

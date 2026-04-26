@@ -1,8 +1,13 @@
-const { useState } = React;
+import { useState } from 'react';
+import apiService from '../../services/api';
 
+/**
+ * ClaimItem — modal for submitting a claim on an item
+ * Props: itemId, onClose, onClaimSuccess
+ */
 function ClaimItem({ itemId, onClose, onClaimSuccess }) {
-  const [notes, setNotes] = useState('');
-  const [error, setError] = useState('');
+  const [notes,   setNotes]   = useState('');
+  const [error,   setError]   = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -62,3 +67,5 @@ function ClaimItem({ itemId, onClose, onClaimSuccess }) {
     </div>
   );
 }
+
+export default ClaimItem;

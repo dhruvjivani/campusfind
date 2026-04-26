@@ -1,26 +1,15 @@
-/**
- * PostItem.jsx — Report a lost or found item  (route: /post)
- *
- * Protected route — user must be logged in (enforced by PrivateRoute in App.jsx).
- *
- * Features:
- *  • Status toggle: "I Lost This" / "I Found This"
- *  • Full item form: name, description, category, campus, location
- *  • Calls POST /api/items/lost or /api/items/found
- *  • Redirects to /browse on success
- */
-
-const { useState } = React;
-const { useHistory } = ReactRouterDOM;
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import apiService from '../services/api';
 
 /**
- * PostItem component
- * @param {{ user: object }} props - Authenticated user (guaranteed by PrivateRoute)
+ * PostItem — Report a lost or found item (route: /post)
+ * Protected route — user must be logged in.
+ * Props: user (object)
  */
 function PostItem({ user }) {
-  const history = useHistory();
+  const navigate = useNavigate();
 
-  /* ── State ───────────────────────────────────────────────────────────────── */
   const [formData, setFormData] = useState({
     title: '', description: '', category: '',
     status: 'lost', location_found: '', campus: 'Main Campus',
@@ -29,22 +18,16 @@ function PostItem({ user }) {
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
-  /* Generic change handler */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  /**
-   * Validates and submits the form.
-   * Calls POST /api/items/lost or /api/items/found depending on formData.status
-   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
 
-    /* Client-side required-field check */
     if (!formData.title || !formData.description || !formData.category || !formData.location_found) {
       setError('Please fill in all required fields.');
       return;
@@ -54,10 +37,9 @@ function PostItem({ user }) {
     try {
       await apiService.createItem(formData);
       setSuccess('Item posted successfully! Redirecting to browse…');
-      /* Reset form */
-      setFormData({ title:'', description:'', category:'', status:'lost',
-                    location_found:'', campus:'Main Campus' });
-      setTimeout(() => history.push('/browse'), 1800);
+      setFormData({ title: '', description: '', category: '', status: 'lost',
+                    location_found: '', campus: 'Main Campus' });
+      setTimeout(() => navigate('/browse'), 1800);
     } catch (err) {
       setError(err.message || 'Failed to post item. Please try again.');
     } finally {
@@ -67,12 +49,10 @@ function PostItem({ user }) {
 
   const isFound = formData.status === 'found';
 
-  /* ── Render ──────────────────────────────────────────────────────────────── */
   return (
     <div className="container">
       <div className="form-container">
 
-        {/* Header — changes based on lost vs. found */}
         <div style={{ marginBottom: 24 }}>
           <h2>{isFound ? '📦 Report Found Item' : '🔍 Report Lost Item'}</h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: 4 }}>
@@ -87,7 +67,7 @@ function PostItem({ user }) {
 
         <form onSubmit={handleSubmit} noValidate>
 
-          {/* ── Status toggle ───────────────────────────────────────────── */}
+          {/* Status toggle */}
           <div className="form-group">
             <label>What happened? <span className="required-star">*</span></label>
             <div className="auth-role-tabs" style={{ marginBottom: 0 }}>
@@ -104,21 +84,18 @@ function PostItem({ user }) {
             </div>
           </div>
 
-          {/* Item name */}
           <div className="form-group">
             <label>Item Name <span className="required-star">*</span></label>
             <input type="text" name="title" value={formData.title} onChange={handleChange}
               required placeholder="e.g., Blue JanSport Backpack" />
           </div>
 
-          {/* Description */}
           <div className="form-group">
             <label>Description <span className="required-star">*</span></label>
             <textarea name="description" value={formData.description} onChange={handleChange}
               required placeholder="Colour, size, brand, identifying marks, contents…" />
           </div>
 
-          {/* Category + Campus */}
           <div className="form-row">
             <div className="form-group">
               <label>Category <span className="required-star">*</span></label>
@@ -144,7 +121,6 @@ function PostItem({ user }) {
             </div>
           </div>
 
-          {/* Location */}
           <div className="form-group">
             <label>
               {isFound ? 'Where You Found It' : 'Last Known Location'}
@@ -168,3 +144,5 @@ function PostItem({ user }) {
     </div>
   );
 }
+
+export default PostItem;

@@ -1,16 +1,8 @@
-/**
- * AuthRequired.jsx — Fallback page for unauthenticated access attempts
- *
- * This component is only used for pages that aren't covered by PrivateRoute
- * (e.g., direct component usage). The main protection is in App.jsx via
- * PrivateRoute which redirects to /login automatically.
- */
-
-const { Link } = ReactRouterDOM;
+import { Link } from 'react-router-dom';
 
 /**
- * AuthRequired component
- * @param {{ message?: string }} props - Optional custom message
+ * AuthRequired — fallback page for unauthenticated access attempts
+ * Props: message (string, optional)
  */
 function AuthRequired({ message }) {
   return (
@@ -31,3 +23,5 @@ function AuthRequired({ message }) {
     </div>
   );
 }
+
+export default AuthRequired;

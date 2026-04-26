@@ -1,47 +1,29 @@
-/**
- * Login.jsx — Authentication: Sign In
- *
- * Features:
- *  • Student / Staff tab switcher (same API endpoint; visual UX cue)
- *  • Show / hide password toggle
- *  • Redirects back to the page the user originally tried to visit
- *    (via React Router location.state.from)
- *
- * Props:
- *   onLoginSuccess {Function} — called with the user object after login
- */
-
-const { useState } = React;
-const { useHistory, useLocation } = ReactRouterDOM;
+import { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import apiService from '../../services/api';
 
 /**
- * Login component
- * @param {{ onLoginSuccess: Function }} props
+ * Login — Sign In page
+ * Props: onLoginSuccess(userData)
  */
 function Login({ onLoginSuccess }) {
-  const history  = useHistory();
-  const location = useLocation();
+  const navigate  = useNavigate();
+  const location  = useLocation();
 
-  /* After login, send the user where they originally wanted to go */
-  const { from } = location.state || { from: { pathname: '/' } };
+  // After login, send the user where they originally wanted to go
+  const from = location.state?.from?.pathname || '/';
 
-  /* ── State ───────────────────────────────────────────────────────────────── */
-  const [role,         setRole]         = useState('student'); // 'student' | 'staff'
+  const [role,         setRole]         = useState('student');
   const [formData,     setFormData]     = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [error,        setError]        = useState('');
   const [loading,      setLoading]      = useState(false);
 
-  /* Generic change handler */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  /**
-   * Submits credentials to POST /api/auth/login
-   * Stores the returned JWT and calls onLoginSuccess.
-   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -56,7 +38,7 @@ function Login({ onLoginSuccess }) {
       const response = await apiService.login(formData);
       apiService.setToken(response.token);
       onLoginSuccess(response.user);
-      history.replace(from); // go back to the intended page
+      navigate(from, { replace: true });
     } catch (err) {
       setError(err.message || 'Invalid credentials. Please try again.');
     } finally {
@@ -66,33 +48,24 @@ function Login({ onLoginSuccess }) {
 
   const isStaff = role === 'staff';
 
-  /* ── Render ──────────────────────────────────────────────────────────────── */
   return (
     <div className="auth-page">
       <div className="auth-split">
 
-        {/* ── Left branding panel ──────────────────────────────────────────── */}
+        {/* Left branding panel */}
         <div className="auth-brand-panel">
           <div className="auth-brand-logo">🔍</div>
           <h2>CampusFind Lost &amp; Found</h2>
           <p>Helping the campus community reunite people with their lost belongings.</p>
           <div className="auth-features">
-            <div className="auth-feature-item">
-              <span>📦</span><span>Post lost or found items instantly</span>
-            </div>
-            <div className="auth-feature-item">
-              <span>🔎</span><span>Search &amp; filter by category or location</span>
-            </div>
-            <div className="auth-feature-item">
-              <span>✅</span><span>Secure claim verification by staff</span>
-            </div>
-            <div className="auth-feature-item">
-              <span>🏫</span><span>All campus locations supported</span>
-            </div>
+            <div className="auth-feature-item"><span>📦</span><span>Post lost or found items instantly</span></div>
+            <div className="auth-feature-item"><span>🔎</span><span>Search &amp; filter by category or location</span></div>
+            <div className="auth-feature-item"><span>✅</span><span>Secure claim verification by staff</span></div>
+            <div className="auth-feature-item"><span>🏫</span><span>All campus locations supported</span></div>
           </div>
         </div>
 
-        {/* ── Right form panel ─────────────────────────────────────────────── */}
+        {/* Right form panel */}
         <div className="auth-form-panel">
           <div className="auth-form-header">
             <h2>Welcome back</h2>
@@ -113,7 +86,6 @@ function Login({ onLoginSuccess }) {
             >🏛 Staff</button>
           </div>
 
-          {/* Staff note */}
           {isStaff && (
             <div className="staff-note">
               <span>ℹ️</span>
@@ -121,12 +93,9 @@ function Login({ onLoginSuccess }) {
             </div>
           )}
 
-          {/* Error alert */}
           {error && <div className="alert error"><span>⚠️</span> {error}</div>}
 
           <form onSubmit={handleSubmit} noValidate>
-
-            {/* Email */}
             <div className="form-group">
               <label>Email address</label>
               <div className="input-wrapper">
@@ -140,7 +109,6 @@ function Login({ onLoginSuccess }) {
               </div>
             </div>
 
-            {/* Password with show/hide toggle */}
             <div className="form-group">
               <label>Password</label>
               <div className="input-wrapper">
@@ -173,7 +141,7 @@ function Login({ onLoginSuccess }) {
 
           <div className="auth-link-row">
             Don't have an account?{' '}
-            <button className="auth-link-btn" onClick={() => history.push('/register')}>
+            <button className="auth-link-btn" onClick={() => navigate('/register')}>
               Create one here
             </button>
           </div>
@@ -183,3 +151,5 @@ function Login({ onLoginSuccess }) {
     </div>
   );
 }
+
+export default Login;

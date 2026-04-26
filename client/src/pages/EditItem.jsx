@@ -1,39 +1,26 @@
-/**
- * EditItem.jsx — Edit / Update an existing item (Full CRUD — Update)
- *
- * Route: /edit/:id  (PrivateRoute — login required)
- *
- * Behaviour:
- *  • Loads the existing item from the API on mount
- *  • Only the original poster can edit their own item
- *  • Submits a PUT /api/items/:id request with updated fields
- *  • Redirects to /items/:id on success
- */
-
-const { useState, useEffect } = React;
-const { useParams, useHistory, Link } = ReactRouterDOM;
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import apiService from '../services/api';
 
 /**
- * EditItem component
- * @param {object} props.user - Currently authenticated user
+ * EditItem — Edit / Update an existing item (route: /edit/:id)
+ * Protected route — login required.
+ * Props: user (object)
  */
 function EditItem({ user }) {
-  /* ── Router hooks ────────────────────────────────────────────────────────── */
-  const { id }    = useParams();   // item ID from the URL
-  const history   = useHistory();  // for programmatic navigation
+  const { id }   = useParams();
+  const navigate = useNavigate();
 
-  /* ── Component state ─────────────────────────────────────────────────────── */
   const [formData, setFormData] = useState({
     title: '', description: '', category: '',
     status: 'found', location_found: '', campus: 'Main Campus',
   });
-  const [loading,    setLoading]    = useState(true);   // initial data fetch
-  const [saving,     setSaving]     = useState(false);  // form submission
+  const [loading,    setLoading]    = useState(true);
+  const [saving,     setSaving]     = useState(false);
   const [error,      setError]      = useState('');
   const [success,    setSuccess]    = useState('');
-  const [notAllowed, setNotAllowed] = useState(false);  // ownership guard
+  const [notAllowed, setNotAllowed] = useState(false);
 
-  /* Fetch the existing item when the component mounts */
   useEffect(() => {
     const fetchItem = async () => {
       setLoading(true);
@@ -41,13 +28,11 @@ function EditItem({ user }) {
         const res = await apiService.getItemById(id);
         const item = res.data;
 
-        /* Guard: only the original poster may edit the item */
         if (item.user_id !== user.id) {
           setNotAllowed(true);
           return;
         }
 
-        /* Pre-populate the form with existing values */
         setFormData({
           title:          item.title          || '',
           description:    item.description    || '',
@@ -65,21 +50,16 @@ function EditItem({ user }) {
     fetchItem();
   }, [id]);
 
-  /* Generic change handler for all form fields */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  /**
-   * Handles form submission — sends PUT /api/items/:id
-   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
 
-    /* Basic validation */
     if (!formData.title || !formData.description || !formData.category || !formData.location_found) {
       setError('Please fill in all required fields.');
       return;
@@ -89,7 +69,7 @@ function EditItem({ user }) {
     try {
       await apiService.updateItem(id, formData);
       setSuccess('Item updated successfully! Redirecting…');
-      setTimeout(() => history.push(`/items/${id}`), 1500);
+      setTimeout(() => navigate(`/items/${id}`), 1500);
     } catch (err) {
       setError(err.message || 'Failed to update item. Please try again.');
     } finally {
@@ -97,7 +77,6 @@ function EditItem({ user }) {
     }
   };
 
-  /* ── Guards ──────────────────────────────────────────────────────────────── */
   if (loading) {
     return (
       <div className="container">
@@ -124,11 +103,9 @@ function EditItem({ user }) {
     );
   }
 
-  /* ── Render ──────────────────────────────────────────────────────────────── */
   return (
     <div className="container">
       <div className="form-container">
-        {/* Header */}
         <div style={{ marginBottom: 24 }}>
           <Link to={`/items/${id}`} style={{ textDecoration: 'none' }}>
             <button className="btn-secondary btn-sm" style={{ marginBottom: 12 }}>← Back to Item</button>
@@ -160,27 +137,20 @@ function EditItem({ user }) {
             </div>
           </div>
 
-          {/* Item name */}
           <div className="form-group">
             <label>Item Name <span className="required-star">*</span></label>
-            <input
-              type="text" name="title"
+            <input type="text" name="title"
               value={formData.title} onChange={handleChange}
-              required placeholder="e.g., Blue JanSport Backpack"
-            />
+              required placeholder="e.g., Blue JanSport Backpack" />
           </div>
 
-          {/* Description */}
           <div className="form-group">
             <label>Description <span className="required-star">*</span></label>
-            <textarea
-              name="description"
+            <textarea name="description"
               value={formData.description} onChange={handleChange}
-              required placeholder="Colour, size, brand, identifying marks…"
-            />
+              required placeholder="Colour, size, brand, identifying marks…" />
           </div>
 
-          {/* Category + Campus side by side */}
           <div className="form-row">
             <div className="form-group">
               <label>Category <span className="required-star">*</span></label>
@@ -206,21 +176,17 @@ function EditItem({ user }) {
             </div>
           </div>
 
-          {/* Location */}
           <div className="form-group">
             <label>Location <span className="required-star">*</span></label>
             <div className="input-wrapper">
               <span className="input-icon">📍</span>
-              <input
-                type="text" name="location_found"
+              <input type="text" name="location_found"
                 value={formData.location_found} onChange={handleChange}
                 required className="has-icon"
-                placeholder="e.g., Library 2nd Floor, Cafeteria, Parking Lot B"
-              />
+                placeholder="e.g., Library 2nd Floor, Cafeteria, Parking Lot B" />
             </div>
           </div>
 
-          {/* Submit */}
           <button type="submit" disabled={saving} className="btn-submit" style={{ marginTop: 8 }}>
             {saving ? '⏳ Saving…' : '💾 Save Changes'}
           </button>
@@ -229,3 +195,5 @@ function EditItem({ user }) {
     </div>
   );
 }
+
+export default EditItem;

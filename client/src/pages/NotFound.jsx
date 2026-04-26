@@ -1,16 +1,8 @@
-/**
- * NotFound.jsx — 404 Page
- *
- * Rendered by the catch-all <Route> at the bottom of App.jsx whenever the
- * user navigates to a path that doesn't match any defined route.
- */
-
-/* Pull in Link from the React Router CDN global */
-const { Link } = ReactRouterDOM;
+import { Link } from 'react-router-dom';
 
 /**
- * NotFound component
- * Displays a friendly 404 message with navigation options.
+ * NotFound — 404 page
+ * Rendered by the catch-all route at the bottom of App.jsx.
  */
 function NotFound() {
   return (
@@ -25,7 +17,6 @@ function NotFound() {
         boxShadow: 'var(--shadow-md)',
         border: '1px solid var(--border)',
       }}>
-        {/* Large 404 numeral */}
         <div style={{
           fontSize: '6rem',
           fontWeight: 800,
@@ -49,35 +40,20 @@ function NotFound() {
           doesn't exist or may have been moved.
         </p>
 
-        {/* Navigation options */}
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-          <Link to="/"
-            style={{
-              background: 'var(--primary)',
-              color: '#fff',
-              padding: '11px 24px',
-              borderRadius: 'var(--radius-sm)',
-              textDecoration: 'none',
-              fontWeight: 600,
-              fontSize: '0.9rem',
-              transition: 'background 0.2s',
-            }}
-          >
+          <Link to="/" style={{
+            background: 'var(--primary)', color: '#fff', padding: '11px 24px',
+            borderRadius: 'var(--radius-sm)', textDecoration: 'none',
+            fontWeight: 600, fontSize: '0.9rem', transition: 'background 0.2s',
+          }}>
             🏠 Back to Home
           </Link>
-          <Link to="/browse"
-            style={{
-              background: 'var(--bg)',
-              color: 'var(--text)',
-              border: '1.5px solid var(--border)',
-              padding: '11px 24px',
-              borderRadius: 'var(--radius-sm)',
-              textDecoration: 'none',
-              fontWeight: 600,
-              fontSize: '0.9rem',
-              transition: 'background 0.2s',
-            }}
-          >
+          <Link to="/browse" style={{
+            background: 'var(--bg)', color: 'var(--text)',
+            border: '1.5px solid var(--border)', padding: '11px 24px',
+            borderRadius: 'var(--radius-sm)', textDecoration: 'none',
+            fontWeight: 600, fontSize: '0.9rem', transition: 'background 0.2s',
+          }}>
             🔎 Browse Items
           </Link>
         </div>
@@ -85,3 +61,5 @@ function NotFound() {
     </div>
   );
 }
+
+export default NotFound;

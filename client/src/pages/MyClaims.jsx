@@ -1,35 +1,22 @@
-/**
- * MyClaims.jsx — Student's claim tracker  (route: /my-claims)
- *
- * Protected route — user must be logged in.
- *
- * Features:
- *  • Lists all claims submitted by the current user
- *  • Status badge + contextual info message per claim
- *  • Cancel button for pending claims (DELETE /api/claims/:id)
- *  • Link to the original item's detail page
- */
-
-const { useState, useEffect } = React;
-const { useHistory, Link }    = ReactRouterDOM;
+import { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import apiService from '../services/api';
 
 /**
- * MyClaims component
- * @param {{ user: object }} props - Authenticated user (guaranteed by PrivateRoute)
+ * MyClaims — Student's claim tracker (route: /my-claims)
+ * Protected route — login required.
+ * Props: user (object)
  */
 function MyClaims({ user }) {
-  const history = useHistory();
+  const navigate = useNavigate();
 
-  /* ── State ───────────────────────────────────────────────────────────────── */
   const [claims,     setClaims]     = useState([]);
   const [loading,    setLoading]    = useState(true);
   const [error,      setError]      = useState('');
-  const [cancelling, setCancelling] = useState({}); // { [claimId]: boolean }
+  const [cancelling, setCancelling] = useState({});
 
-  /* Load claims on mount */
   useEffect(() => { loadClaims(); }, []);
 
-  /** Fetches GET /api/claims/user/my-claims */
   const loadClaims = async () => {
     setLoading(true);
     setError('');
@@ -43,17 +30,12 @@ function MyClaims({ user }) {
     }
   };
 
-  /**
-   * Cancels a pending claim via DELETE /api/claims/:id
-   * Updates local state immediately after success (no full re-fetch needed).
-   * @param {number} claimId
-   */
   const handleCancel = async (claimId) => {
     if (!window.confirm('Cancel this claim?')) return;
     setCancelling(prev => ({ ...prev, [claimId]: true }));
     try {
       await apiService.deleteClaim(claimId);
-      setClaims(prev => prev.filter(c => c.id !== claimId)); // optimistic removal
+      setClaims(prev => prev.filter(c => c.id !== claimId));
     } catch (err) {
       setError(err.message || 'Failed to cancel claim.');
     } finally {
@@ -61,10 +43,7 @@ function MyClaims({ user }) {
     }
   };
 
-  /** Maps claim status to a status icon */
   const statusIcon = { pending: '⏳', verified: '✅', rejected: '❌', completed: '🏁' };
-
-  /** Contextual message shown below each claim's badge */
   const statusNote = {
     pending:   'Your claim is under review by staff.',
     verified:  'Claim approved — please contact staff to arrange pickup.',
@@ -72,7 +51,6 @@ function MyClaims({ user }) {
     completed: 'Item has been returned to you.',
   };
 
-  /* ── Render ──────────────────────────────────────────────────────────────── */
   return (
     <div className="container">
 
@@ -93,13 +71,12 @@ function MyClaims({ user }) {
           <span className="empty-state-icon">📋</span>
           <h3>No claims yet</h3>
           <p>Browse items to find something that belongs to you, then submit a claim.</p>
-          <button onClick={() => history.push('/browse')}>Browse Items</button>
+          <button onClick={() => navigate('/browse')}>Browse Items</button>
         </div>
       ) : (
         <div className="grid">
           {claims.map(claim => (
             <div key={claim.id} className="card">
-              {/* Item thumbnail */}
               {claim.item_image && (
                 <img
                   src={claim.item_image} alt={claim.item_title || 'Item'}
@@ -108,7 +85,6 @@ function MyClaims({ user }) {
                 />
               )}
 
-              {/* Title + status badge */}
               <div className="card-header">
                 <h3 className="card-title">{claim.item_title || 'Item'}</h3>
                 <span className={`badge ${claim.status}`}>
@@ -117,7 +93,6 @@ function MyClaims({ user }) {
                 </span>
               </div>
 
-              {/* Status message */}
               {statusNote[claim.status] && (
                 <div className={`alert ${
                   claim.status === 'verified' || claim.status === 'completed' ? 'success'
@@ -127,7 +102,6 @@ function MyClaims({ user }) {
                 </div>
               )}
 
-              {/* User's submitted notes */}
               {claim.verification_notes && (
                 <div style={{
                   background: 'var(--bg)', borderRadius: 'var(--radius-sm)',
@@ -144,14 +118,12 @@ function MyClaims({ user }) {
                 </span>
               </div>
 
-              {/* Action buttons */}
               <div className="card-actions">
                 {claim.item_id && (
                   <Link to={`/items/${claim.item_id}`} style={{ flex: 1, textDecoration: 'none' }}>
                     <button className="btn-secondary" style={{ width: '100%' }}>View Item</button>
                   </Link>
                 )}
-                {/* Cancel only allowed on pending claims */}
                 {claim.status === 'pending' && (
                   <button
                     className="danger"
@@ -170,3 +142,5 @@ function MyClaims({ user }) {
     </div>
   );
 }
+
+export default MyClaims;

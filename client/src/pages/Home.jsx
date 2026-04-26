@@ -1,27 +1,16 @@
-/**
- * Home.jsx — Landing / Dashboard page  (route: /)
- *
- * Shows:
- *  • Hero banner with CTA buttons (context-aware: guest vs. student vs. staff)
- *  • Live stats fetched from the API (total / lost / found counts)
- *  • "How it works" feature cards
- *  • Guest CTA section
- */
-
-const { useState, useEffect } = React;
-const { useHistory, Link }    = ReactRouterDOM;
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import apiService from '../services/api';
 
 /**
- * Home component
- * @param {{ user: object|null }} props
+ * Home — Landing / Dashboard page (route: /)
+ * Props: user (object|null)
  */
 function Home({ user }) {
-  const history = useHistory();
+  const navigate = useNavigate();
 
-  /** @type {[{ total: number, lost: number, found: number }, Function]} */
   const [stats, setStats] = useState({ total: 0, lost: 0, found: 0 });
 
-  /* Fetch live stats on mount */
   useEffect(() => {
     const loadStats = async () => {
       try {
@@ -31,8 +20,8 @@ function Home({ user }) {
           apiService.getItems({ status: 'found' }),
         ]);
         setStats({
-          total: allRes.total  || 0,
-          lost:  lostRes.total || 0,
+          total: allRes.total   || 0,
+          lost:  lostRes.total  || 0,
           found: foundRes.total || 0,
         });
       } catch {
@@ -47,7 +36,7 @@ function Home({ user }) {
   return (
     <div className="container">
 
-      {/* ── Hero ─────────────────────────────────────────────────────────── */}
+      {/* Hero */}
       <div className="hero">
         <span className="hero-icon">🔍</span>
         <h1>
@@ -59,31 +48,29 @@ function Home({ user }) {
           fast, secure, and completely free.
         </p>
 
-        {/* CTA buttons differ by auth/role state */}
         <div className="hero-actions">
-          <button className="hero-btn-primary" onClick={() => history.push('/browse')}>
+          <button className="hero-btn-primary" onClick={() => navigate('/browse')}>
             🔎 Browse Items
           </button>
 
           {user ? (
             <>
-              <button className="hero-btn-secondary" onClick={() => history.push('/post')}>
+              <button className="hero-btn-secondary" onClick={() => navigate('/post')}>
                 + Post an Item
               </button>
               {isStaff && (
-                <button className="hero-btn-secondary" onClick={() => history.push('/staff')}>
+                <button className="hero-btn-secondary" onClick={() => navigate('/staff')}>
                   🏛 Staff Panel
                 </button>
               )}
             </>
           ) : (
-            <button className="hero-btn-secondary" onClick={() => history.push('/register')}>
+            <button className="hero-btn-secondary" onClick={() => navigate('/register')}>
               🎓 Create Account
             </button>
           )}
         </div>
 
-        {/* Personalised welcome for logged-in users */}
         {user && (
           <p style={{ marginTop: 24, fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)' }}>
             Welcome back,{' '}
@@ -93,7 +80,7 @@ function Home({ user }) {
         )}
       </div>
 
-      {/* ── Live Stats ───────────────────────────────────────────────────── */}
+      {/* Live Stats */}
       <div className="grid-3" style={{ marginBottom: 32 }}>
         <div className="stat-card blue">
           <div className="stat-number">{stats.total}</div>
@@ -109,10 +96,8 @@ function Home({ user }) {
         </div>
       </div>
 
-      {/* ── How it works ─────────────────────────────────────────────────── */}
-      <h2 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: 16 }}>
-        How it works
-      </h2>
+      {/* How it works */}
+      <h2 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: 16 }}>How it works</h2>
       <div className="features-grid" style={{ marginBottom: 32 }}>
         <div className="feature-card">
           <div className="feature-icon blue">🔎</div>
@@ -131,7 +116,7 @@ function Home({ user }) {
         </div>
       </div>
 
-      {/* ── Guest call-to-action ─────────────────────────────────────────── */}
+      {/* Guest CTA */}
       {!user && (
         <div className="card" style={{
           textAlign: 'center', padding: '40px 24px',
@@ -142,10 +127,10 @@ function Home({ user }) {
             Create a free account to post items, submit claims, and track your requests.
           </p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button className="success" onClick={() => history.push('/register')}>
+            <button className="success" onClick={() => navigate('/register')}>
               🎓 Register as Student
             </button>
-            <button className="btn-secondary" onClick={() => history.push('/login')}>
+            <button className="btn-secondary" onClick={() => navigate('/login')}>
               Already have an account? Sign In
             </button>
           </div>
@@ -155,3 +140,5 @@ function Home({ user }) {
     </div>
   );
 }
+
+export default Home;
